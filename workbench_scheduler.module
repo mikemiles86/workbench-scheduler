@@ -200,6 +200,11 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
       '#type'         => 'fieldset',
       '#title'        => t('Schedule Dates'),
       '#description'  => t('Select the start and/or end dates to trigger states changes for this node.'),
+      '#states'       => array(
+        'invisible' => array(
+          ':input[name=workbench_scheduler_sid]' => array('value' => '0'),
+        ),
+      ),
     );
 
     //start date
