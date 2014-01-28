@@ -7,7 +7,7 @@
 
 
 /**
- * display a table of worbench schedule for administration
+ * display a table of workbench schedule for administration
  * @return string  themed output.
  */
 function workbench_scheduler_admin_page() {
@@ -36,9 +36,9 @@ function workbench_scheduler_admin_page() {
       //more then one type?
       if ($type_count > 1) {
         $items = array();
-        //lopp through each type
+        //loop through each type
         foreach ($schedule->types as $type) {
-          //display the humna readable name
+          //display the human readable name
           $items[] = $node_types[$type]->name;
         }
 
@@ -93,9 +93,9 @@ function workbench_scheduler_admin_page() {
 
 /**
  * display a form for adding/editing a schedule
- * @param  array  $form       the form array
- * @param  array  $form_state the form state array
- * @param  string $name       machine name of schedule (optional)
+ * @param  array      $form       the form array
+ * @param  array      $form_state the form state array
+ * @param bool|string $name       machine name of schedule (optional)
  * @return array              the form array
  * @ingroup forms
  */
@@ -138,7 +138,7 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name=FALS
   //save to the form
   $form['#states'] = $states;
 
-  //select list for starti state
+  //select list for start state
   $form['start_state'] = array(
     '#type'           => 'select',
     '#title'          => t('Start State'),
@@ -274,7 +274,7 @@ function workbench_scheduler_admin_edit_schedule_submit($form, &$form_state) {
  * @ingroup forms
  */
 function workbench_scheduler_admin_delete_schedule($form, &$form_state, $name) {
-  //attempt to load the scheudle
+  //attempt to load the schedule
   if ($schedule = workbench_scheduler_load_schedules($name)) {
     //store to form
     $form['#schedule'] = $schedule;

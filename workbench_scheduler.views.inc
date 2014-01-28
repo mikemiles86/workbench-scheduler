@@ -90,7 +90,7 @@ function workbench_scheduler_views_data() {
 
   $data['workbench_scheduler_nodes']['completed'] = array(
     'title' => t('Completed'),
-    'help'  => t('Wheather or not this node schedule has been completed'),
+    'help'  => t('Whether or not this node schedule has been completed'),
     'field' => array(
       'handler' => 'views_handler_field_boolean',
       'click sortable' => TRUE,
@@ -134,7 +134,7 @@ function workbench_scheduler_views_data() {
 
   $data['workbench_scheduler_schedules']['name'] = array(
     'title' => t('Machine name'),
-    'help'  => t('The machine readable name of the scheudle'),
+    'help'  => t('The machine readable name of the schedule'),
     'field' => array(
       'handler' => 'views_handler_field',
     ),
@@ -145,7 +145,7 @@ function workbench_scheduler_views_data() {
 
   $data['workbench_scheduler_schedules']['label'] = array(
     'title' => t('Schedule Name'),
-    'help'  => t('The human readable name of the scheudle'),
+    'help'  => t('The human readable name of the schedule'),
     'field' => array(
       'handler' => 'views_handler_field',
     ),
