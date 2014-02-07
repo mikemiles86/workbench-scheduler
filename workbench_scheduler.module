@@ -320,7 +320,7 @@ function workbench_scheduler_cron() {
   //only run if there are schedules
   if (workbench_scheduler_schedules_exist()) {
     //run scheduler
-    $curr_time = mktime();
+    $curr_time = time();
     //process the start date schedules
     workbench_scheduler_process_start_dates($curr_time);
     //process the end date schedules
