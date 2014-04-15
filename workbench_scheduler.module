@@ -277,8 +277,10 @@ function workbench_scheduler_node_form_validate($form, &$form_state) {
   //no sid however was a start date or end date selected?
   }
   elseif ($start_date || $end_date) {
-    //need to select a schedule for the dates.
-    form_set_error('workbench_scheduler_sid', t('Must select a workbench schedule to apply to the provided date(s)'));
+    if ($form_state['values']['workbench_scheduler_sid'] != 0) {
+      //need to select a schedule for the dates unless No schedule was selected.
+      form_set_error('workbench_scheduler_sid', t('Must select a workbench schedule to apply to the provided date(s)'));
+    }
   }
 }
 
@@ -301,8 +303,8 @@ function workbench_scheduler_node_form_submit($form, &$form_state) {
   $nid = $form_state['node']->nid;
   $vid = $form_state['node']->vid;
 
-  //have a schedule selected?
-  if ($schedule_data['sid']) {
+  //have a schedule selected? sid of 0 for removing a schedule.
+  if ($schedule_data['sid'] || $schedule_data['sid'] == 0) {
     //attempt to save the schedule for this node
     if (workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data)) {
       //success
@@ -464,24 +466,32 @@ function workbench_scheduler_load_node_schedule($nid, $vid) {
  */
 function workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data) {
   //need to have the sid and start date  or end date data
-  if (isset($schedule_data['sid']) && ($schedule_data['start_date'] || $schedule_data['end_date'])) {
-    //run a merge query to insert or update the row
-    $merge = db_merge('workbench_scheduler_nodes')
-      ->key(array(
-          'nid' => $nid,
-          'vid' => $vid,
-        ))
-      ->fields(array(
-          'sid'         => $schedule_data['sid'],
-          //start date if it was passed
-          'start_date'  => $schedule_data['start_date'] ? $schedule_data['start_date'] : 0,
-          //end if it was passed
-          'end_date'    => $schedule_data['end_date'] ? $schedule_data['end_date'] : 0,
-        ))
-      ->execute();
-    //was the merge successful?
-    if ($merge) {
-      return TRUE;
+  if (isset($schedule_data['sid']) && ($schedule_data['sid'] == 0 || $schedule_data['start_date'] || $schedule_data['end_date'])) {
+    if ($schedule_data['sid'] != 0) {
+      //run a merge query to insert or update the row
+      $merge = db_merge('workbench_scheduler_nodes')
+        ->key(array(
+            'nid' => $nid,
+            'vid' => $vid,
+          ))
+        ->fields(array(
+            'sid'         => $schedule_data['sid'],
+            //start date if it was passed
+            'start_date'  => $schedule_data['start_date'] ? $schedule_data['start_date'] : 0,
+            //end if it was passed
+            'end_date'    => $schedule_data['end_date'] ? $schedule_data['end_date'] : 0,
+          ))
+        ->execute();
+
+        //was the merge successful?
+        if ($merge) {
+          return TRUE;
+        }
+    } elseif ($schedule_data['sid'] == 0) {
+      //make sure the this revision has no schedule
+      if (workbench_scheduler_delete_node_schedule($nid, $vid)) {
+        return TRUE;
+      }
     }
   }
   //return boolean false if missing fields or failed query
