@@ -445,6 +445,8 @@ function workbench_scheduler_load_node_schedule($nid, $vid) {
   $node_schedule_query->condition('wsn.nid', $nid)
   // AND node revision id matches this node revision
     ->condition('wsn.vid', $vid)
+  // AND schedule not completed
+    ->condition('wsn.completed', 0)
   // Only return the first result
     ->range(0, 1);
   $node_schedule = $node_schedule_query->execute();
