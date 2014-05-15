@@ -491,9 +491,9 @@ function workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data) {
         }
     } elseif ($schedule_data['sid'] == 0) {
       //make sure the this revision has no schedule
-      if (workbench_scheduler_delete_node_schedule($nid, $vid)) {
-        return TRUE;
-      }
+       workbench_scheduler_delete_node_schedule($nid, $vid);
+      //Schedule_data removed
+      return TRUE;
     }
   }
   //return boolean false if missing fields or failed query
