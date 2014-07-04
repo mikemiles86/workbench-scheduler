@@ -313,3 +313,62 @@ function workbench_scheduler_admin_delete_schedule_submit($form, &$form_state) {
     drupal_set_message(t('Error deleting schedule'), 'error', FALSE);
   }
 }
+
+
+
+function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $node) {	
+	$revisions = node_revision_list($node);
+	foreach ($revisions as $vid => $revision) {
+		$node_schedules[$vid] = workbench_scheduler_load_node_schedule($node->nid, $vid);		
+	}
+	$node_schedules = array_filter($node_schedules);
+	if ($node_schedules) {		
+		$manage_schedules = array();	
+		foreach ($node_schedules as $vid => $node_schedule) {		
+			$start_date = 'not set';
+			$end_date = 'not set';
+			if ($node_schedule->start_date) $start_date = format_date($node_schedule->start_date, 'custom', 'Y-m-d H:i:s');
+			if ($node_schedule->end_date) $end_date = format_date($node_schedule->end_date, 'custom', 'Y-m-d H:i:s');
+			$manage_schedules[$vid] = array (
+				'title' => array('data' => array('#title' => $vid)),
+				'vid'   	=> l($vid, 'node/' . $node->nid . '/revisions/' . $vid . '/view'),
+				'label'     => $node_schedule->label,
+				'start_state'   => $node_schedule->start_state,
+				'start_date'   => $start_date,
+				'end_state'     => $node_schedule->end_state,
+				'end_date'     => $end_date,
+			);		
+		} 	
+		$form['nid'] = array('#type' => 'hidden', '#value' => $node->nid);
+		$form['manage_node_schedules'] = array( 
+			'#type'         => 'tableselect',
+			'#title'        => t('Schedules applied to this node'),	
+			'#options'      => $manage_schedules,
+			'#multiple'     => TRUE,
+			'#header'       => array(
+				'vid'   	=> t('Revision ID'),
+				'label'     => t('Schedule Name'),
+				'start_state'   => t('Start State'),
+				'start_date'   => t('Start Date'),
+				'end_state'     => t('End State'),
+				'end_date'     => t('End Date'),
+			),
+		);	
+		$form['actions'] = array('#type' => 'actions');
+		$form['actions']['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Delete selected'),
+		);
+		return $form;  
+	}
+	else {
+		drupal_set_message(t('No schedules applied to this node'), 'status', FALSE);
+	}	
+}
+
+function workbench_scheduler_admin_manage_node_schedules_submit($form, &$form_state) {
+	$nid = $form_state['values']['nid'];	
+	foreach ($form_state['values']['manage_node_schedules'] as $vid => $checked) {		
+		if ($vid == $checked) { workbench_scheduler_delete_node_schedule($nid,$vid); }
+	}	
+}
