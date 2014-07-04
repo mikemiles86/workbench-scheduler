@@ -58,6 +58,17 @@ function workbench_scheduler_menu() {
     'access arguments'  => array('administer workbench schedules'),
     'file'              => 'workbench_scheduler.admin.inc',
   );
+  
+  //manage node schedules
+  $items['node/%node/manage_schedules'] = array(
+    'title'             => 'Manage Schedules',
+    'description'       => 'Manage the schedules set for this node.',
+    'type' 			        => MENU_LOCAL_TASK,	
+    'page callback' 	  => 'drupal_get_form',
+    'page arguments'    => array('workbench_scheduler_admin_manage_node_schedules',1),	
+    'access arguments'  => array('set workbench schedule'),
+    'file'              => 'workbench_scheduler.admin.inc',	
+  );
 
   return $items;
 }
