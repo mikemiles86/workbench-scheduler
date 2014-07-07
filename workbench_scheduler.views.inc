@@ -19,12 +19,12 @@ function workbench_scheduler_views_data() {
       'left_table'  => 'node_revision',
       'left_field'  => 'vid',
       'field'       => 'vid',
-      'type'        => 'INNER',
+      'type'        => 'LEFT OUTER',
     ),
     'node_revision' => array(
       'left_field'  => 'vid',
       'field'       => 'vid',
-      'type'        => 'INNER',
+      'type'        => 'LEFT OUTER',
     ),
   );
 
