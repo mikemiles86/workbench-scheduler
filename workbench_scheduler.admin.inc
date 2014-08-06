@@ -313,3 +313,192 @@ function workbench_scheduler_admin_delete_schedule_submit($form, &$form_state) {
     drupal_set_message(t('Error deleting schedule'), 'error', FALSE);
   }
 }
+
+/**
+ * tableselect form for current schedules applied to a node
+ * @param  array      $form       the form array
+ * @param  array      $form_state the form state array
+ * @param  object     $node       the node object
+ * @return array                  the form array
+ * @ingroup forms
+ */
+function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $node) {
+  $revisions = node_revision_list($node);
+  foreach ($revisions as $vid => $revision) {
+    // Load up all the schedules for all revisions of this node
+    $node_schedules[$vid] = workbench_scheduler_load_node_schedule($node->nid, $vid);
+  }
+  $node_schedules = array_filter($node_schedules);
+  // If there are schedules applied to this node
+  if ($node_schedules) {
+    $manage_schedules = array();
+    foreach ($node_schedules as $vid => $node_schedule) {
+      $start_date = 'not set';
+      $end_date = 'not set';
+      if ($node_schedule->start_date) {
+        $start_date = format_date($node_schedule->start_date, 'custom', 'Y-m-d H:i:s');
+      }
+      if ($node_schedule->end_date) {
+        $end_date = format_date($node_schedule->end_date, 'custom', 'Y-m-d H:i:s');
+      }
+      // Build each row of the tableselect
+      $manage_schedules[$vid] = array (
+        'title'        => array('data' => array('#title' => $vid)),
+        'vid'          => l($vid, 'node/' . $node->nid . '/revisions/' . $vid . '/view'),
+        'label'        => $node_schedule->label,
+        'start_state'  => $node_schedule->start_state,
+        'start_date'   => $start_date,
+        'end_state'    => $node_schedule->end_state,
+        'end_date'     => $end_date,
+        'vid_edit'     => l('Edit', 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
+      );
+    }
+    // Build the the tableselect form, with a hidden field for the nid
+    $form['nid'] = array('#type' => 'hidden', '#value' => $node->nid);
+    $form['manage_node_schedules'] = array(
+      '#type'      => 'tableselect',
+      '#title'     => t('Schedules applied to this node'),
+      '#options'   => $manage_schedules,
+      '#multiple'  => TRUE,
+      '#header'    => array(
+        'vid'          => t('Revision ID'),
+        'label'        => t('Schedule Name'),
+        'start_state'  => t('Start State'),
+        'start_date'   => t('Start Date'),
+        'end_state'    => t('End State'),
+        'end_date'     => t('End Date'),
+        'vid_edit'     => t('Edit'),
+      ),
+    );
+    // The form submit actions
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array(
+      '#type'   => 'submit',
+      '#value'  => t('Delete selected'),
+    );
+    return $form;
+  }
+  else {
+    // When no schedules applied to this node, display a status message
+    drupal_set_message(t('No schedules applied to this node'), 'status', FALSE);
+  }
+}
+
+/**
+ * submit function for deleting the schedule(s) set for a node's vid
+ * @param  array $form       the form array
+ * @param  array $form_state the form state array
+ * @return none
+ */
+function workbench_scheduler_admin_manage_node_schedules_submit($form, &$form_state) {
+  $nid = $form_state['values']['nid'];
+  foreach ($form_state['values']['manage_node_schedules'] as $vid => $checked) {
+    if ($vid == $checked) {
+      workbench_scheduler_delete_node_schedule($nid, $vid);
+    }
+  }
+}
+
+/**
+ * form to edit the schedule for an existing node revision
+ * @param  array      $form       the form array
+ * @param  array      $form_state the form state array
+ * @param  object     $node       the node object
+ * @param  string     $vid        the revision id to edit the schedule for
+ * @return array                  the form array
+ * @ingroup forms
+ *
+ * Similar to workbench_scheduler_form_node_form_alter
+ * Uses workbench_scheduler_node_form_validate
+ */
+function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $node, $vid) {
+  $form['nid'] = array('#type' => 'hidden', '#value' => $node->nid);
+  $form['vid'] = array('#type' => 'hidden', '#value' => $vid);
+  $type_schedules = workbench_scheduler_load_type_schedules($node->type);
+  $schedule_options = array();
+  $schedule_options[] = array(
+    'label'        => t('No Schedule'),
+    'start_state'  => '',
+    'end_state'    => '',
+  );
+  $moderation_states = workbench_scheduler_state_labels();
+  foreach ($type_schedules as $schedule) {
+    $schedule_options[$schedule->sid] = array(
+      'label'        => $schedule->label,
+      'start_state'  => $moderation_states[$schedule->start_state],
+      'end_state'    => $moderation_states[$schedule->end_state],
+    );
+  }
+  $form['workbench_scheduler_sid'] = array(
+    '#type'         => 'tableselect',
+    '#title'        => t('Select Schedule'),
+    '#description'  => t('Select the schedule to use for this node.'),
+    '#options'      => $schedule_options,
+    '#multiple'     => FALSE,
+    '#header'       => array(
+      'label'          => t('Name'),
+      'start_state'    => t('Start State'),
+      'end_state'      => t('End State'),
+    ),
+  );
+  // Dates
+  $form['workbench_scheduler_start_date'] = array(
+    '#type'         => 'date_popup',
+    '#date_format'  => 'Y-m-d H:i',
+    '#title'        => t('Start date'),
+    '#description'  => t('Select the date to switch this node to the scheduled \'start state\''),
+  );
+  $form['workbench_scheduler_end_date'] = array(
+    '#type'         => 'date_popup',
+    '#date_format'  => 'Y-m-d H:i',
+    '#title'        => t('End date'),
+    '#description'  => t('Select the date to switch this node to the scheduled \'end state\''),
+  );
+  // Add existing node schedule as defaults
+  $node_schedule = workbench_scheduler_load_node_schedule($node->nid, $vid);
+  if ($node_schedule) {
+    $form['workbench_scheduler_sid']['#default_value'] = $node_schedule->sid;
+    if ($node_schedule->start_date) {
+      $start_date = format_date($node_schedule->start_date, 'custom', 'Y-m-d H:i:s');
+      $form['workbench_scheduler_start_date']['#default_value'] = $start_date;
+    }
+    if ($node_schedule->end_date) {
+      $end_date = format_date($node_schedule->end_date, 'custom', 'Y-m-d H:i:s');
+      $form['workbench_scheduler_end_date']['#default_value'] = $end_date;
+    }
+  }
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#validate' => array (
+      'workbench_scheduler_node_form_validate',
+    )
+  );
+  return $form;
+}
+
+/**
+ * submit function for editing the schedule applied to a node's revision
+ * @param  array $form       the form array
+ * @param  array $form_state the form state array
+ * @return none
+ *
+ * Similar to workbench_scheduler_node_form_submit
+ */
+function workbench_scheduler_admin_edit_revision_schedule_submit($form, &$form_state) {
+  $schedule_data = array(
+    'sid'         => $form_state['values']['workbench_scheduler_sid'],
+    'start_date'  => strtotime($form_state['values']['workbench_scheduler_start_date']),
+    'end_date'    => strtotime($form_state['values']['workbench_scheduler_end_date']),
+  );
+  $nid = $form_state['values']['nid'];
+  $vid = $form_state['values']['vid'];
+  if (workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data)) {
+    drupal_set_message(t('Revision schedule updated'), 'status', FALSE);
+    drupal_goto('node/' . $nid .'/manage_schedules/');
+  }
+  else {
+    drupal_set_message(t('Error saving workbench schedule for node'), 'error', FALSE);
+  }
+}

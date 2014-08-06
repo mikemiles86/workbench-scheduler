@@ -59,7 +59,42 @@ function workbench_scheduler_menu() {
     'file'              => 'workbench_scheduler.admin.inc',
   );
 
+  //manage node schedules
+  $items['node/%node/manage_schedules'] = array(
+    'title'             => 'Manage Schedules',
+    'description'       => 'Manage the schedules set for this node.',
+    'type'              => MENU_LOCAL_TASK,
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('workbench_scheduler_admin_manage_node_schedules', 1),
+    'access arguments'  => array('set workbench schedule'),
+    'file'              => 'workbench_scheduler.admin.inc',
+  );
+  
+  //edit existing node schedule for a revision
+  $items['node/%node/manage_schedules/%/edit'] = array(
+    'title'             => 'Edit Revision Schedule',
+    'description'       => 'Edit the schedule for this revision',
+    'type'              => MENU_CALLBACK,
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('workbench_scheduler_admin_edit_revision_schedule', 1, 3),
+    'access arguments'  => array('set workbench schedule'),
+    'file'              => 'workbench_scheduler.admin.inc',
+  );
+  
   return $items;
+}
+
+/**
+* Implements hook_admin_paths().
+*/
+function workbench_scheduler_admin_paths() {
+  if (variable_get('node_admin_theme')) {
+    $paths = array(
+      'node/*/manage_schedules' => TRUE,
+      'node/*/manage_schedules/*/edit' => TRUE,
+    );
+    return $paths;
+  }
 }
 
 /**
