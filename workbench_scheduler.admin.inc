@@ -422,13 +422,17 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
     'end_state'    => '',
   );
   $moderation_states = workbench_scheduler_state_labels();
+  //add each type schedule to the options array
   foreach ($type_schedules as $schedule) {
-    $schedule_options[$schedule->sid] = array(
-      'label'        => $schedule->label,
-      'start_state'  => $moderation_states[$schedule->start_state],
-      'end_state'    => $moderation_states[$schedule->end_state],
-    );
+    if (user_access('set any workbench schedule') || user_access('set workbench schedule for ' . $schedule->name)) {
+      $schedule_options[$schedule->sid] = array(
+        'label' => $schedule->label,
+        'start_state' => $moderation_states[$schedule->start_state],
+        'end_state' => $moderation_states[$schedule->end_state],
+      );
+    }
   }
+
   $form['workbench_scheduler_sid'] = array(
     '#type'         => 'tableselect',
     '#title'        => t('Select Schedule'),

@@ -69,7 +69,7 @@ function workbench_scheduler_menu() {
     'access arguments'  => array('set workbench schedule'),
     'file'              => 'workbench_scheduler.admin.inc',
   );
-  
+
   //edit existing node schedule for a revision
   $items['node/%node/manage_schedules/%/edit'] = array(
     'title'             => 'Edit Revision Schedule',
@@ -80,7 +80,7 @@ function workbench_scheduler_menu() {
     'access arguments'  => array('set workbench schedule'),
     'file'              => 'workbench_scheduler.admin.inc',
   );
-  
+
   return $items;
 }
 
@@ -113,6 +113,18 @@ function workbench_scheduler_permission() {
   $permissions['set workbench schedule'] = array(
     'title' => t('Set workbench schedule'),
   );
+
+  $permissions['set any workbench schedule'] = array(
+    'title' => t('Set any workbench schedule'),
+  );
+
+  if ($schedules = workbench_scheduler_load_schedules()) {
+    foreach ($schedules as $schedule) {
+      $permissions['set workbench schedule for ' . $schedule->name] = array(
+        'title' => t('Set workbench schedule for ' . '"' . $schedule->label . '"'),
+      );
+    }
+  }
 
   return $permissions;
 }
@@ -209,11 +221,13 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
 
     //add each type schedule to the options array
     foreach ($type_schedules as $schedule) {
-      $schedule_options[$schedule->sid] = array(
-        'label'        => $schedule->label,
-        'start_state'  => $moderation_states[$schedule->start_state],
-        'end_state'    => $moderation_states[$schedule->end_state],
-      );
+      if (user_access('set any workbench schedule') || user_access('set workbench schedule for ' . $schedule->name)) {
+        $schedule_options[$schedule->sid] = array(
+          'label' => $schedule->label,
+          'start_state' => $moderation_states[$schedule->start_state],
+          'end_state' => $moderation_states[$schedule->end_state],
+        );
+      }
     }
 
     //create table select for selecting schedule
