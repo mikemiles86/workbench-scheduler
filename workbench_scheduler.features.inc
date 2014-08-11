@@ -85,9 +85,10 @@ function workbench_scheduler_features_enable_feature($module) {
  * Store each exported schedule in the database.
  */
 function workbench_scheduler_features_rebuild($module) {
-  $defaults = features_get_default('workbench_scheduler', $module);
-  foreach ($defaults as $schedule) {
-    workbench_scheduler_save_schedule($schedule['name'], $schedule);
+  if ($defaults = features_get_default('workbench_scheduler', $module)) {
+    foreach ($defaults as $schedule) {
+      workbench_scheduler_save_schedule($schedule['name'], $schedule);
+    }
   }
   drupal_static_reset('workbench_scheduler_load_schedules');
 }
