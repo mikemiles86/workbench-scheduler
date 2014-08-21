@@ -180,6 +180,15 @@ function workbench_scheduler_node_delete($node) {
 }
 
 /**
+ * Implements hook_node_type_delete().
+ */
+function workbench_scheduler_node_type_delete($info) {
+  $delete = db_delete('workbench_scheduler_types');
+  $delete->condition('type', $info->type);
+  $delete->execute();
+}
+
+/**
  * Implements hook_node_revision_delete().
  */
 function workbench_scheduler_node_revision_delete($node) {
