@@ -180,6 +180,15 @@ function workbench_scheduler_node_delete($node) {
 }
 
 /**
+ * Implements hook_node_type_delete().
+ */
+function workbench_scheduler_node_type_delete($info) {
+  $delete = db_delete('workbench_scheduler_types');
+  $delete->condition('type', $info->type);
+  $delete->execute();
+}
+
+/**
  * Implements hook_node_revision_delete().
  */
 function workbench_scheduler_node_revision_delete($node) {
@@ -205,6 +214,9 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
       '#collapsed'    => TRUE,
       '#group'        => 'additional_settings',
       '#access'       => user_access('set workbench schedule'),
+      '#attached' => array(
+        'js' => array(drupal_get_path('module', 'workbench_scheduler') . '/js/workbench_scheduler.js'),
+      ),
     );
 
     //build an options array for which schedules to choose
@@ -229,6 +241,8 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
         );
       }
     }
+
+    drupal_add_js(array('workbench_scheduler' => array('schedules' => $schedule_options)), 'setting');
 
     //create table select for selecting schedule
     $form['workbench_scheduler']['workbench_scheduler_sid'] = array(
