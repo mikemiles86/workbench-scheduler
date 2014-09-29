@@ -27,7 +27,7 @@
    * @ingroup workbench_scheduler_hooks
    * @ingroup hooks
    */
-  fuction hook_workbench_scheduler_post_save_node_schedule($nid, $vid, $schedule_data) {
+  function hook_workbench_scheduler_post_save_node_schedule($nid, $vid, $schedule_data) {
     // Load the node.
     $node = node_load($nid, $vid);
     // Set a watchdog log message.
@@ -50,7 +50,7 @@
    * @ingroup workbench_scheduler_hooks
    * @ingroup hooks
    */
-  fuction hook_workbench_scheduler_post_delete_node_schedule($nid, $vid, $sid) {
+  function hook_workbench_scheduler_post_delete_node_schedule($nid, $vid, $sid) {
     // Load the node.
     $node = node_load($nid, $vid);
     // Set a watchdog log message.
@@ -77,7 +77,7 @@
    * @ingroup workbench_scheduler_hooks
    * @ingroup hooks
    */
-  fuction hook_workbench_scheduler_post_process_start_dates($scheduled_nodes) {
+  function hook_workbench_scheduler_post_process_start_dates($scheduled_nodes) {
     // Set a watchdog log message.
     watchdog('workbench_scheduler', '@count nodes had their schedules started.', array('@count' => count($scheduled_nodes)), WATCHDOG_NOTICE);
   }
@@ -102,7 +102,7 @@
    * @ingroup workbench_scheduler_hooks
    * @ingroup hooks
    */
-  fuction hook_workbench_scheduler_post_process_end_dates($scheduled_nodes) {
+  function hook_workbench_scheduler_post_process_end_dates($scheduled_nodes) {
     // Set a watchdog log message.
     watchdog('workbench_scheduler', '@count nodes had their schedules ended.', array('@count' => count($scheduled_nodes)), WATCHDOG_NOTICE);
   }
