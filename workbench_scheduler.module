@@ -236,8 +236,8 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
       if (user_access('set any workbench schedule') || user_access('set workbench schedule for ' . $schedule->name)) {
         $schedule_options[$schedule->sid] = array(
           'label' => $schedule->label,
-          'start_state' => $moderation_states[$schedule->start_state],
-          'end_state' => $moderation_states[$schedule->end_state],
+          'start_state'  => (!empty($schedule->start_state) ? $moderation_states[$schedule->start_state] : ''),
+          'end_state'    => (!empty($schedule->end_state) ? $moderation_states[$schedule->end_state] : ''),
         );
       }
     }
@@ -318,10 +318,23 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
  * @return none
  */
 function workbench_scheduler_node_form_validate($form, &$form_state) {
+
+  if (!empty($form_state['values']['workbench_scheduler_start_date'])) {
+    $start_date = $form_state['values']['workbench_scheduler_start_date'];
+  }
+  else {
+    $start_date = '';
+  }
+
+  if (!empty($form_state['values']['workbench_scheduler_end_date'])) {
+    $end_date   = $form_state['values']['workbench_scheduler_end_date'];
+  }
+  else {
+    $end_date = '';
+  }
+
   //retrieve schedule data
   $sid        = $form_state['values']['workbench_scheduler_sid'];
-  $start_date = $form_state['values']['workbench_scheduler_start_date'];
-  $end_date   = $form_state['values']['workbench_scheduler_end_date'];
 
   //was a schedule selected?
   if ($sid && ($sid > 0) ) {
@@ -354,13 +367,27 @@ function workbench_scheduler_node_form_validate($form, &$form_state) {
  * @return none
  */
 function workbench_scheduler_node_form_submit($form, &$form_state) {
+  if (!empty($form_state['values']['workbench_scheduler_start_date'])) {
+    $start_date = $form_state['values']['workbench_scheduler_start_date'];
+  }
+  else {
+    $start_date = '';
+  }
+
+  if (!empty($form_state['values']['workbench_scheduler_end_date'])) {
+    $end_date   = $form_state['values']['workbench_scheduler_end_date'];
+  }
+  else {
+    $end_date = '';
+  }
+
   //retrieve schedule data
   $schedule_data = array(
     'sid'         => $form_state['values']['workbench_scheduler_sid'],
     //format to timestamp for storage
-    'start_date'  => strtotime($form_state['values']['workbench_scheduler_start_date']),
+    'start_date'  => strtotime($start_date),
     //format to timestamp for storage
-    'end_date'    => strtotime($form_state['values']['workbench_scheduler_end_date']),
+    'end_date'    => strtotime($end_date),
   );
   //get the node data from the form state
   $nid = $form_state['node']->nid;
