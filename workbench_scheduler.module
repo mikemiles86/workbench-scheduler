@@ -208,7 +208,7 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
     //add a scheduler section
     $form['workbench_scheduler'] = array(
       '#type'         => 'fieldset',
-      '#title'        => 'Workbench Schedule',
+      '#title'        => t('Workbench Schedule'),
       '#description'  => t('Select a schedule for changing moderation states.'),
       '#collapsible'  => TRUE,
       '#collapsed'    => TRUE,
