@@ -59,8 +59,8 @@ function workbench_scheduler_admin_page() {
       $row = array(
         $schedule->label,
         $name,
-        $states[$schedule->start_state],
-        $states[$schedule->end_state],
+        (!empty($states[$schedule->start_state]) ? $states[$schedule->start_state] : ''),
+        (!empty($states[$schedule->end_state]) ? $states[$schedule->end_state] : ''),
         $types,
         //link to edit the schedule
         l(t('Edit'), 'admin/config/workbench/scheduler/schedules/' . $name . '/edit'),
@@ -138,13 +138,16 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name=FALS
   //save to the form
   $form['#states'] = $states;
 
+  // add none option
+  $states = array_merge(array('' => t('None')), $states);
+
   //select list for start state
   $form['start_state'] = array(
     '#type'           => 'select',
     '#title'          => t('Start State'),
     '#description'    => t('Select the state to be set when a node reaches its \'start date\''),
     '#options'        => $states,
-    '#required'       => TRUE,
+    '#required'       => FALSE,
   );
 
   //select list for end state
@@ -153,7 +156,7 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name=FALS
     '#title'        => t('End State'),
     '#description'  => t('Select the state to be set when a node reaches its \'end date\''),
     '#options'      => $states,
-    '#required'     => TRUE,
+    '#required'     => FALSE,
   );
 
   // fetch a list of content types that have moderation enabled.
