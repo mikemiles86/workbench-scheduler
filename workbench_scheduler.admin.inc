@@ -430,8 +430,8 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
     if (user_access('set any workbench schedule') || user_access('set workbench schedule for ' . $schedule->name)) {
       $schedule_options[$schedule->sid] = array(
         'label' => $schedule->label,
-        'start_state' => $moderation_states[$schedule->start_state],
-        'end_state' => $moderation_states[$schedule->end_state],
+        'start_state' => isset($moderation_states[$schedule->start_state]) ? $moderation_states[$schedule->start_state] : '',
+        'end_state' => isset($moderation_states[$schedule->end_state]) ? $moderation_states[$schedule->end_state] : '',
       );
     }
   }
@@ -461,6 +461,25 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
     '#title'        => t('End date'),
     '#description'  => t('Select the date to switch this node to the scheduled \'end state\''),
   );
+
+  // Node only allow most recent revision schedule?
+  $type_settings = variable_get('workbench_scheduler_'.$node->type, FALSE);
+  // Check if only process latest revision
+  if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
+     // getting the latest revision
+    $rev_list = node_revision_list($node);
+    $latest_vid = max(array_keys($rev_list));
+
+    // Is this vid not the most recent?
+    if ($latest_vid != $vid) {
+      $form['note'] = array(
+        '#type' => 'item',
+        '#title' => t('Note'),
+        '#markup' => t('THIS SCHEDULE WILL NOT BE RUN. This node type is set to run the schedule for only the most '. l('recent revision', 'node/'.$node->nid.'/manage_schedules/'.$latest_vid.'/edit')),
+      );
+    }
+  }
+
   // Add existing node schedule as defaults
   $node_schedule = workbench_scheduler_load_node_schedule($node->nid, $vid);
   if ($node_schedule) {
