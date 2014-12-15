@@ -607,7 +607,7 @@ function workbench_scheduler_load_node_schedule($nid, $vid) {
   // Join the workbench_scheduler_schedule table on the schedule id
   $node_schedule_query->innerjoin('workbench_scheduler_schedules', 'wss', 'wsn.sid = wss.sid');
   //retrieve the node start and end date
-  $node_schedule_query->fields('wsn', array('start_date', 'end_date'))
+  $node_schedule_query->fields('wsn', array('start_date', 'end_date', 'completed'))
   //retrieve all data for the schedule
     ->fields('wss');
   // WHERE node id matches this node id
@@ -615,7 +615,7 @@ function workbench_scheduler_load_node_schedule($nid, $vid) {
   // AND node revision id matches this node revision
     ->condition('wsn.vid', $vid)
   // AND schedule not completed
-    ->condition('wsn.completed', 0)
+  //  ->condition('wsn.completed', 0)
   // Only return the first result
     ->range(0, 1);
   $node_schedule = $node_schedule_query->execute();

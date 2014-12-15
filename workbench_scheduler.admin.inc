@@ -327,6 +327,19 @@ function workbench_scheduler_admin_delete_schedule_submit($form, &$form_state) {
  */
 function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $node) {
   $revisions = node_revision_list($node);
+
+  $schedules = array(
+    'schedule_active' => array(),
+    'schedule_inactive' => array(),
+  );
+
+  // Check to see if this node type supports more than on
+  $type_settings = variable_get('workbench_scheduler_'.$node->type);
+  $limit_current_revision = FALSE;
+  if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
+    $limit_current_revision = TRUE;
+  }
+
   foreach ($revisions as $vid => $revision) {
     // Load up all the schedules for all revisions of this node
     $node_schedules[$vid] = workbench_scheduler_load_node_schedule($node->nid, $vid);
@@ -344,8 +357,9 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
       if ($node_schedule->end_date) {
         $end_date = format_date($node_schedule->end_date, 'custom', 'Y-m-d H:i:s');
       }
+
       // Build each row of the tableselect
-      $manage_schedules[$vid] = array (
+      $manage_schedules = array (
         'title'        => array('data' => array('#title' => $vid)),
         'vid'          => l($vid, 'node/' . $node->nid . '/revisions/' . $vid . '/view'),
         'label'        => $node_schedule->label,
@@ -353,26 +367,76 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         'start_date'   => $start_date,
         'end_state'    => $node_schedule->end_state,
         'end_date'     => $end_date,
+        'completed'    => ($node_schedule->completed) ? t('Yes') : t('No'),
         'vid_edit'     => l('Edit', 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
       );
+
+      // Limit Current revision - only run schedule on highest vid
+      if($limit_current_revision){
+
+        // Active schedule?
+        if ($node->workbench_moderation['current']->vid == $vid) {
+          $schedules['schedule_active'][$vid] = $manage_schedules;
+        } else {
+          $schedules['schedule_inactive'][$vid] = $manage_schedules;
+
+        }
+      // Run on all schedules that haven't completed yet (default behavior)
+      }else{
+
+        // Active schedule?
+        if (!$node_schedule->completed) {
+          $schedules['schedule_active'][$vid] = $manage_schedules;
+        } else {
+          $schedules['schedule_inactive'][$vid] = $manage_schedules;
+
+        }
+
+      }
     }
-    // Build the the tableselect form, with a hidden field for the nid
-    $form['nid'] = array('#type' => 'hidden', '#value' => $node->nid);
-    $form['manage_node_schedules'] = array(
-      '#type'      => 'tableselect',
-      '#title'     => t('Schedules applied to this node'),
-      '#options'   => $manage_schedules,
-      '#multiple'  => TRUE,
-      '#header'    => array(
-        'vid'          => t('Revision ID'),
-        'label'        => t('Schedule Name'),
-        'start_state'  => t('Start State'),
-        'start_date'   => t('Start Date'),
-        'end_state'    => t('End State'),
-        'end_date'     => t('End Date'),
-        'vid_edit'     => t('Edit'),
-      ),
-    );
+
+    // Render Schedules
+    foreach ($schedules as $status => $schedule) {
+      if(!empty($schedule)){
+          // Build the the tableselect form, with a hidden field for the nid
+          $form['nid'] = array('#type' => 'hidden', '#value' => $node->nid);
+
+
+          // Fieldsets
+          if ($status == 'schedule_active') {
+            $fieldset = array(
+              '#type'=>'fieldset',
+              '#title' => t('Active Schedule'),
+              '#description' => t('Only active schedules are run.'),
+            );
+
+          } else {
+            $fieldset = array(
+              '#type'=>'fieldset',
+              '#title' => t('Inactive Schedules'),
+            );
+          }
+
+          // Output the form
+          $form[$status.'_fieldset'] = $fieldset;
+          $form[$status.'_fieldset'][$status] = array(
+            '#type'      => 'tableselect',
+            '#title'     => t('Schedules applied to this node'),
+            '#options'   => $schedule,
+            '#multiple'  => TRUE,
+            '#header'    => array(
+              'vid'          => t('Revision ID'),
+              'label'        => t('Schedule Name'),
+              'start_state'  => t('Start State'),
+              'start_date'   => t('Start Date'),
+              'end_state'    => t('End State'),
+              'end_date'     => t('End Date'),
+              'completed'     => t('Completed'),
+              'vid_edit'     => t('Edit'),
+            ),
+          );
+      }
+    }
     // The form submit actions
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array(
@@ -395,9 +459,12 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
  */
 function workbench_scheduler_admin_manage_node_schedules_submit($form, &$form_state) {
   $nid = $form_state['values']['nid'];
-  foreach ($form_state['values']['manage_node_schedules'] as $vid => $checked) {
-    if ($vid == $checked) {
-      workbench_scheduler_delete_node_schedule($nid, $vid);
+  $fieldsets = array('schedule_active', 'schedule_inactive');
+  foreach($fieldsets as $key){
+    foreach ($form_state['values'][$key] as $vid => $checked) {
+      if ($vid == $checked) {
+        workbench_scheduler_delete_node_schedule($nid, $vid);
+      }
     }
   }
 }
