@@ -163,23 +163,46 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name=FALS
   // from the workbench moderation module
   module_load_include('module', 'workbench_moderation');
   $types = workbench_moderation_moderate_node_types();
-  $tmp_types = array();
+  $info = entity_get_info('node');
+
   //make into an associative array
   foreach ($types as $type) {
-    $tmp_types[$type] = $type;
+    $states = workbench_moderation_states();
+    $default_state = variable_get('workbench_moderation_default_state_' . $type, workbench_moderation_state_none());
+    $label = $info['bundles'][$type]['label'];
+    $tmp_types[$type] = array(
+      'label' => $label,
+      'default_state' => $states[$default_state]->label,
+    );
   }
-  $types = $tmp_types;
-  unset($tmp_types);
   //store types to the form
   $form['#types'] = $types;
+  $types = $tmp_types;
+  unset($tmp_types);
 
+  $header = array(
+    'label' => t('Content Type'),
+    'default_state' => t('Default Moderation State'),
+  );
+
+  // Label  and description
+  $form['table_label'] = array(
+    '#type' => 'markup',
+    '#markup' => '<label>'.t('Content Types').'</label>',
+  );
+  $form['table_description'] = array(
+    '#type' => 'markup',
+    '#markup' => t('Select the content types that can use this schedule'),
+  );
   //checkboxes for content types
   $form['types'] = array(
-    '#type'           => 'checkboxes',
+    '#type'           => 'tableselect',
     '#title'          => t('Content Types'),
     '#description'    => t('Select the content types that can use this schedule'),
+    '#header'         => $header,
     '#options'        => $types,
     '#required'       => TRUE,
+    '#empty' => t('No Content Types are configured with workbench moderation'),
   );
 
   $form['submit'] = array(
@@ -194,13 +217,14 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name=FALS
       '#type'   => 'submit',
       '#value'  => t('Delete'),
     );
+
     //remove the machine name field
     unset($form['name']);
     //set default values for the other fields
     $form['label']['#default_value']        = $schedule->label;
     $form['start_state']['#default_value']  = $schedule->start_state;
     $form['end_state']['#default_value']    = $schedule->end_state;
-    $form['types']['#default_value']        = $schedule->types;
+    $form['types']['#default_value']        = drupal_map_assoc($schedule->types);
   }
   //return the form
   return $form;
