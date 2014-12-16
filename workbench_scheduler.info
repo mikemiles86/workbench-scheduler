@@ -13,4 +13,4 @@ files[] = workbench_scheduler.views.inc
 files[] = workbench_scheduler.features.inc
 files[] = includes/workbench_scheduler_handler_filter_state.inc
 files[] = includes/workbench_scheduler_handler_filter_name.inc
-files[] = tests/*.test
+files[] = tests/workbench_scheduler.test

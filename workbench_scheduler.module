@@ -308,7 +308,7 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
         //display message depending on schedule settings.
     $msg = '';
 
-    $type_settings = variable_get('workbench_scheduler_'.$form['#node']->type, FALSE);
+    $type_settings = variable_get('workbench_scheduler_'.$form['#node']->type, array());
     // Check if only process latest revision
     if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
       $msg = t('Only the schedule for the most recent revision will be run.');
@@ -1198,7 +1198,7 @@ function workbench_scheduler_process_end_dates($timestamp) {
     foreach ($scheduled_nodes as $node_schedule) {
 
       $do_process = FALSE;
-      $type_settings = variable_get('workbench_scheduler_'.$node_schedule->type, FALSE);
+      $type_settings = variable_get('workbench_scheduler_'.$node_schedule->type, array());
 
       // Only process latest revision
       if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
