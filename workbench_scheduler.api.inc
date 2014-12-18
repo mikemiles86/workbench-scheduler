@@ -58,7 +58,7 @@
   }
 
   /**
-   * Perform action after starting schdules for nodes
+   * Perform action after starting schedules for nodes.
    *
    * This hook is invoked from workbench_scheduler_process_start_dates() after
    * starting schedules for nodes.
@@ -83,7 +83,7 @@
   }
 
   /**
-   * Perform action after ending schdules for nodes
+   * Perform action after ending schedules for nodes.
    *
    * This hook is invoked from workbench_scheduler_process_end_dates() after
    * ending schedules for nodes.
