@@ -357,8 +357,8 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
     'schedule_inactive' => array(),
   );
 
-  // Check to see if this node type supports more than on
-  $type_settings = variable_get('workbench_scheduler_'.$node->type);
+  // Check to see if this node type supports more than one
+  $type_settings = variable_get('workbench_scheduler_'.$node->type, array());
   $limit_current_revision = FALSE;
   if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
     $limit_current_revision = TRUE;
@@ -556,7 +556,7 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
   );
 
   // Node only allow most recent revision schedule?
-  $type_settings = variable_get('workbench_scheduler_'.$node->type, FALSE);
+  $type_settings = variable_get('workbench_scheduler_'.$node->type, array());
   // Check if only process latest revision
   if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
      // getting the latest revision

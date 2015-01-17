@@ -88,7 +88,7 @@ function workbench_scheduler_menu() {
 * Implements hook_admin_paths().
 */
 function workbench_scheduler_admin_paths() {
-  if (variable_get('node_admin_theme')) {
+  if (variable_get('node_admin_theme', FALSE)) {
     $paths = array(
       'node/*/manage_schedules' => TRUE,
       'node/*/manage_schedules/*/edit' => TRUE,
@@ -1087,7 +1087,7 @@ function workbench_scheduler_process_start_dates($timestamp) {
     foreach ($schedule_nodes as $node_schedule) {
 
       $do_process = FALSE;
-      $type_settings = variable_get('workbench_scheduler_'.$node_schedule->type, FALSE);
+      $type_settings = variable_get('workbench_scheduler_'.$node_schedule->type, array());
 
       // Only process latest revision
       if(in_array('workbench_scheduler_limit_current_revision', $type_settings)){
