@@ -394,7 +394,7 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         'end_state'    => isset($moderation_states[$node_schedule->end_state]) ? $moderation_states[$node_schedule->end_state] : $node_schedule->end_state,
         'end_date'     => $end_date,
         'completed'    => ($node_schedule->completed) ? t('Yes') : t('No'),
-        'vid_edit'     => l('Edit', 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
+        'vid_edit'     => l(t('Edit'), 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
       );
 
       // Limit Current revision - only run schedule on highest vid

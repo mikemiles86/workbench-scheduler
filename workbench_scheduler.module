@@ -322,7 +322,7 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
         $msg = format_plural($active_schedules,
           'There is still 1 active schedule for a previous revision. !link',
           'There are still @count active schedules for previous revisions. !link',
-          array('!link' => l('Review Schedules', 'node/' . $form['#node']->nid . '/manage_schedules')));
+          array('!link' => l(t('Review Schedules'), 'node/' . $form['#node']->nid . '/manage_schedules')));
       }
     }
 
