@@ -369,12 +369,14 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
     $node_schedules[$vid] = workbench_scheduler_load_node_schedule($node->nid, $vid);
   }
   $node_schedules = array_filter($node_schedules);
+  // Load labels of moderation states
+  $moderation_states = workbench_scheduler_state_labels();
   // If there are schedules applied to this node
   if ($node_schedules) {
     $manage_schedules = array();
     foreach ($node_schedules as $vid => $node_schedule) {
-      $start_date = 'not set';
-      $end_date = 'not set';
+      $start_date = t('not set');
+      $end_date = t('not set');
       if ($node_schedule->start_date) {
         $start_date = format_date($node_schedule->start_date, 'custom', 'Y-m-d H:i:s');
       }
@@ -387,9 +389,9 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         'title'        => array('data' => array('#title' => $vid)),
         'vid'          => l($vid, 'node/' . $node->nid . '/revisions/' . $vid . '/view'),
         'label'        => $node_schedule->label,
-        'start_state'  => $node_schedule->start_state,
+        'start_state'  => isset($moderation_states[$node_schedule->start_state]) ? $moderation_states[$node_schedule->start_state] : $node_schedule->start_state,
         'start_date'   => $start_date,
-        'end_state'    => $node_schedule->end_state,
+        'end_state'    => isset($moderation_states[$node_schedule->end_state]) ? $moderation_states[$node_schedule->end_state] : $node_schedule->end_state,
         'end_date'     => $end_date,
         'completed'    => ($node_schedule->completed) ? t('Yes') : t('No'),
         'vid_edit'     => l('Edit', 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
