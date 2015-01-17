@@ -165,6 +165,7 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name=FALS
   $types = workbench_moderation_moderate_node_types();
   $info = entity_get_info('node');
 
+  $tmp_types = array();
   //make into an associative array
   foreach ($types as $type) {
     $states = workbench_moderation_states();
