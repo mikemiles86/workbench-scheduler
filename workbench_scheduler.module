@@ -243,7 +243,11 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
       }
     }
 
-    drupal_add_js(array('workbench_scheduler' => array('schedules' => $schedule_options)), 'setting');
+    //add schedules to JavaScript settings
+    $form['workbench_scheduler']['#attached']['js'][] = array(
+      'data' => array('workbench_scheduler' => array('schedules' => $schedule_options)),
+      'type' => 'setting',
+    );
 
     //create table select for selecting schedule
     $form['workbench_scheduler']['workbench_scheduler_sid'] = array(
