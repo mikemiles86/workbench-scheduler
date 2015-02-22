@@ -11,58 +11,56 @@
 function workbench_scheduler_schema() {
   $schema = array();
 
-  //schedules table
+  // Schedules table.
   $schema['workbench_scheduler_schedules'] = array(
-     'description' => t('Saves data for workbench schedules that can be run on the system'),
-     'fields' => array(
-        'sid' => array(
-          'description' => t('The unique id for a schedule'),
-          'type'        => 'serial',
-          'not null'    => TRUE,
-        ),
-        'name' => array(
-          'description' => t('A unique machine name to identify the schedule'),
-          'type'        => 'varchar',
-          'length'      => '255',
-          'not null'    => TRUE,
-        ),
-        'label' => array(
-          'description' => t('A label for the schedule'),
-          'type'        => 'varchar',
-          'length'      => '255',
-          'not null'    => TRUE,
-        ),
-        'start_state' => array(
-          'description' => t('The state to set at the start date'),
-          'type'        => 'varchar',
-          'length'      => '255',
-          'not null'    => TRUE,
-        ),
-        'end_state' => array(
-          'description' => t('The state to set at the end date'),
-          'type'        => 'varchar',
-          'length'      => '255',
-          'not null'    => TRUE,
-        ),
+    'description' => 'Saves data for workbench schedules that can be run on the system',
+    'fields' => array(
+      'sid' => array(
+        'description' => 'The unique id for a schedule',
+        'type'        => 'serial',
+        'not null'    => TRUE,
       ),
-     'primary key' => array('sid'),
-     'unique keys' => array(
-        'name' => array('name'),
+      'name' => array(
+        'description' => 'A unique machine name to identify the schedule',
+        'type'        => 'varchar',
+        'length'      => '255',
+        'not null'    => TRUE,
       ),
+      'label' => array(
+        'description' => 'A label for the schedule',
+        'type'        => 'varchar',
+        'length'      => '255',
+        'not null'    => TRUE,
+      ),
+      'start_state' => array(
+        'description' => 'The state to set at the start date',
+        'type'        => 'varchar',
+        'length'      => '255',
+        'not null'    => TRUE,
+      ),
+      'end_state' => array(
+        'description' => 'The state to set at the end date',
+        'type'        => 'varchar',
+        'length'      => '255',
+        'not null'    => TRUE,
+      ),
+    ),
+   'primary key' => array('sid'),
+   'unique keys' => array('name' => array('name')),
   );
 
-  //schedule content types table
+  // Schedule content types table.
   $schema['workbench_scheduler_types'] = array(
-    'description' => t('Saves the associations between schedules and content types'),
+    'description' => 'Saves the associations between schedules and content types',
     'fields' => array(
       'name' => array(
-        'description' => t('The machine name of a schedule'),
+        'description' => 'The machine name of a schedule',
         'type'        => 'varchar',
         'length'      => '255',
         'not null'    => TRUE,
       ),
       'type' => array(
-        'description' => t('The machine name of a content type'),
+        'description' => 'The machine name of a content type',
         'type'        => 'varchar',
         'length'      => '255',
         'not null'    => TRUE,
@@ -73,43 +71,43 @@ function workbench_scheduler_schema() {
     ),
   );
 
-  //schedule nodes table
+  // Schedule nodes table.
   $schema['workbench_scheduler_nodes'] = array(
-    'description' => t('Saves the schedule information for nodes'),
+    'description' => 'Saves the schedule information for nodes',
     'fields' => array(
       'nid' => array(
-        'description' => t('The node id'),
+        'description' => 'The node id',
         'type'        => 'int',
         'not null'    => TRUE,
         'unsigned'    => TRUE,
       ),
       'vid' => array(
-        'description' => t('The revision id of the node'),
+        'description' => 'The revision id of the node',
         'type'        => 'int',
         'not null'    => TRUE,
         'unsigned'    => TRUE,
       ),
       'sid' => array(
-        'description' => t('The id of the schedule'),
+        'description' => 'The id of the schedule',
         'type'        => 'int',
         'not null'    => TRUE,
         'unsigned'    => TRUE,
       ),
       'start_date' => array(
-        'description' => t('the date when the start state should be applied'),
+        'description' => 'the date when the start state should be applied',
         'type'        => 'int',
         'unsigned'    => TRUE,
         'not null'    => TRUE,
       ),
       'end_date' => array(
-        'description' => t('the date when the end state should be applied'),
+        'description' => 'the date when the end state should be applied',
         'type'        => 'int',
         'unsigned'    => TRUE,
         'default'     => 0,
         'not null'    => FALSE,
       ),
       'completed' => array(
-        'description' => t('mark if the schedule has been completed for this node'),
+        'description' => 'mark if the schedule has been completed for this node',
         'type'        => 'int',
         'unsigned'    => TRUE,
         'default'     => 0,

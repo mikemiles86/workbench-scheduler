@@ -7,10 +7,6 @@ dependencies[] = workbench_moderation
 dependencies[] = date
 dependencies[] = date_popup
 
-files[] = workbench_scheduler.module
-files[] = workbench_scheduler.admin.inc
-files[] = workbench_scheduler.views.inc
-files[] = workbench_scheduler.features.inc
 files[] = includes/workbench_scheduler_handler_filter_state.inc
 files[] = includes/workbench_scheduler_handler_filter_name.inc
 files[] = tests/workbench_scheduler.test

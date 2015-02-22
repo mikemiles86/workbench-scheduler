@@ -1,7 +1,9 @@
 <?php
   /**
-   * @file workbench_scheduler.api.inc
-   *  defines workbench_scheduler hooks that can be used by other modules.
+   * @file
+   * workbench_scheduler.api.inc
+   *
+   * Defines workbench_scheduler hooks that can be used by other modules.
    */
 
   /**

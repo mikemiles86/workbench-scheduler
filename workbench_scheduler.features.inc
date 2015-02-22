@@ -57,7 +57,7 @@ function workbench_scheduler_features_export_render($module_name, $data) {
   foreach ($data as $schedule) {
     $items[$schedule] = workbench_scheduler_load_schedules($schedule);
 
-    // Unset SID to prevent overridden state
+    // Unset SID to prevent overridden state.
     unset($items[$schedule]->sid);
   }
 

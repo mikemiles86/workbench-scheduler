@@ -1,5 +1,8 @@
 /**
  * @file
+ * js/workbench_scheduler.js
+ *
+ * The javascript functionality for workbench Scheduler.
  * Sets the summary for Workbench Scheduler on vertical tabs.
  */
 (function ($) {
@@ -14,7 +17,7 @@
             var end_date = $('input[name="workbench_scheduler_end_date[date]"]');
             var end_time = $('input[name="workbench_scheduler_end_date[time]"]');
 
-            // Hiding start date field
+            // Hiding start date field.
             if (Drupal.settings.workbench_scheduler.schedules[type_input.val()].start_state == '') {
                 start_date.val('');
                 start_time.val('');
@@ -24,7 +27,7 @@
                 $(".form-item-workbench-scheduler-start-date").show();
             }
 
-            // Hiding end date field
+            // Hiding end date field.
             if (Drupal.settings.workbench_scheduler.schedules[type_input.val()].end_state == '') {
                 end_date.val('');
                 end_time.val('');
@@ -41,23 +44,23 @@
         }
     };
 
-    // Vertical tabs
+    // Vertical tabs.
     Drupal.behaviors.workbenchSchedulerSettingsSummary = {
         attach: function (context) {
 
             $('#edit-workbench-scheduler', context).drupalSetSummary(function (context) {
-                var vals = new Array();
+                var vals = [];
 
-                // Schedule type
+                // Schedule type.
                 var type_input = $('input[name="workbench_scheduler_sid"]:checked');
                 var type = Drupal.settings.workbench_scheduler.schedules[type_input.val()];
 
                 vals.push(type.label);
 
-                // If schedule exists
+                // If schedule exists.
                 if(type_input.val() > 0){
 
-                    // Start Date and Time
+                    // Start Date and Time.
                     var start_date = $('input[name="workbench_scheduler_start_date[date]"]');
                     var start_time = $('input[name="workbench_scheduler_start_date[time]"]');
                     var start_text = $('label[for="edit-workbench-scheduler-start-date"]');
@@ -81,4 +84,3 @@
     };
 
 })(jQuery);
-
