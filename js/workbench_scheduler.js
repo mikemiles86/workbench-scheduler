@@ -1,13 +1,13 @@
 /**
  * @file
- * js/workbench_scheduler.js
  *
  * The javascript functionality for workbench Scheduler.
  * Sets the summary for Workbench Scheduler on vertical tabs.
  */
+
 (function ($) {
 
-    // Hiding start and end date fields
+    // Hiding start and end date fields.
     Drupal.behaviors.workbenchSchedulerOptions = {
         attach: function (context) {
 
@@ -68,7 +68,7 @@
                         vals.push(Drupal.t('@start_text: @start_date @start_time', {'@start_text': start_text.text(), '@start_date':start_date.val(), '@start_time':start_time.val()}));
                     }
 
-                    // End Date and Time
+                    // End Date and Time.
                     var end_date = $('input[name="workbench_scheduler_end_date[date]"]');
                     var end_time = $('input[name="workbench_scheduler_end_date[time]"]');
                     var end_text = $('label[for="edit-workbench-scheduler-end-date"]');

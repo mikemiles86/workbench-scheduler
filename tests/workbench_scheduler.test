@@ -83,7 +83,7 @@ class WorkbenchSchedulerScheduleTestCase extends WorkbenchSchedulerTestCase {
 
       // Checking table relationships.
       $query->join('workbench_scheduler_types', 'wst', "wss.name = wst.name AND wst.type ='{$this->content_type}'");
-      $result = $query->execute()->rowCount();
+      $query->execute();
 
       $this->assertTrue($query, 'Workbench Schedule saved');
 
