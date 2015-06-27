@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Drush utility commands for workbench_scheduler
@@ -12,7 +11,7 @@ function workbench_scheduler_drush_command() {
   $items['workbench-scheduler-run'] = array(
     'description' => 'Run workbench scheduler schedules.',
     'callback' => 'workbench_scheduler_drush_run',
-    'alaises' => array('wbs-run', 'wbsr'),
+    'aliases' => array('wbs-run', 'wbsr'),
   );
 
   return $items;
@@ -23,5 +22,8 @@ function workbench_scheduler_drush_command() {
  */
 function workbench_scheduler_drush_run() {
   // Call the run function, to process schedules.
-  _workbench_scheduler_run();
+  $count = _workbench_scheduler_run();
+  drupal_set_message(t('@count Workbench Schedules were processed.', array(
+    '@count' => $count,
+  )));
 }
