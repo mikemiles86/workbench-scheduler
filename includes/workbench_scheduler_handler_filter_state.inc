@@ -4,10 +4,10 @@
  * @file
  * Filter based on moderation state.
  */
+
 class workbench_scheduler_handler_filter_state extends views_handler_filter_in_operator {
   /**
-   * return filter options for schedule states
-   * @return none
+   * Return filter options for schedule states.
    */
   function get_value_options() {
     if (!isset($this->value_options)) {

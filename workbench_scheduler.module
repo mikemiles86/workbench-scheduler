@@ -87,7 +87,8 @@ function workbench_scheduler_menu() {
 /**
  * Access callback to see if current node type allows schedules.
  *
- * @return boolean
+ * @return bool
+ *   Return boolean value.
  */
 function workbench_scheduler_manage_schedules_access_check() {
   // First make sure user has access.
@@ -119,7 +120,7 @@ function workbench_scheduler_admin_paths() {
 /**
  * Implements hook_permission().
  *
- * Provides permissions for workbench schedules
+ * Provides permissions for workbench schedules.
  */
 function workbench_scheduler_permission() {
   $permissions = array();
@@ -141,7 +142,8 @@ function workbench_scheduler_permission() {
     foreach ($schedules as $schedule) {
       $permissions['set workbench schedule for ' . $schedule->name] = array(
         'title' => t('Set workbench schedule for "@label"', array(
-            '@label' => $schedule->label)
+            '@label' => $schedule->label,
+          )
         ),
       );
     }
@@ -421,9 +423,9 @@ function workbench_scheduler_node_form_validate($form, &$form_state) {
 /**
  * Submit function for editing a scheduled node.
  *
- * @param  array $form
+ * @param array $form
  *    The form array.
- * @param  array $form_state
+ * @param array $form_state
  *    The form state array.
  */
 function workbench_scheduler_node_form_submit($form, &$form_state) {
@@ -622,7 +624,7 @@ function workbench_scheduler_count_node_schedules($nid, $status = FALSE) {
     ->fields('wsn', array('nid'));
   // Retrieve count of completed.
   $node_schedules->addExpression('SUM(wsn.completed)', 'completed_schedules');
-  // Retireve count of active (count of completed - sum).
+  // Retrieve count of active (count of completed - sum).
   $node_schedules->addExpression('(COUNT(wsn.completed) - SUM(wsn.completed))', 'active_schedules');
   // WHERE node id matches this node id.
   $node_schedules->condition('wsn.nid', $nid)
@@ -656,9 +658,9 @@ function workbench_scheduler_count_node_schedules($nid, $status = FALSE) {
 /**
  * Retrieves schedule data for a given node revision.
  *
- * @param  int $nid
+ * @param int $nid
  *    Node id.
- * @param  int $vid node
+ * @param int $vid
  *    Revision id.
  *
  * @return mixed
@@ -674,7 +676,9 @@ function workbench_scheduler_load_node_schedule($nid, $vid) {
   $node_schedule_query->fields('wsn', array(
     'start_date',
     'end_date',
-    'completed'))
+    'completed',
+    )
+  )
   // Retrieve all data for the schedule.
     ->fields('wss');
   // WHERE node id matches this node id.
@@ -750,9 +754,9 @@ function workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data) {
  *
  * @param int $nid
  *    The node_id.
- * @param  int $vid
+ * @param int $vid
  *    Optional node revision id.
- * @param  int $sid
+ * @param int $sid
  *    Optional schedule id.
  *
  * @return bool
@@ -858,7 +862,7 @@ function workbench_scheduler_load_type_schedules($types) {
     // Take only a subsection of what was retrieved.
     $return_schedules = array_intersect_key($schedules, $types);
     // Able to get they types?
-    if (sizeof($return_schedules) > 0) {
+    if (count($return_schedules) > 0) {
       // Only want a single one?
       if ($get_single) {
         // And that type exists in the array?
@@ -913,7 +917,7 @@ function workbench_scheduler_load_schedules($names = FALSE) {
   }
 
   // Only need to query the DB if noe schedules, no names or missing names.
-  if (!$schedules || (count($schedules) < 1) || !isset($missing_names) || (count($missing_names)>0)) {
+  if (!$schedules || (count($schedules) < 1) || !isset($missing_names) || (count($missing_names) > 0)) {
     // Build query to retrieve schedules.
     $schedules_query = db_select('workbench_scheduler_schedules', 'wss');
     // Left join the types table to get related content types based on.
@@ -931,7 +935,7 @@ function workbench_scheduler_load_schedules($names = FALSE) {
 
     // Have previously retrieved schedules?
     if (isset($retrieved_names)) {
-      // Aadd condition not to retrieve these.
+      // Add condition not to retrieve these.
       $schedules_query->condition('wss.name', $retrieved_names, 'NOT IN');
     }
 
@@ -975,7 +979,7 @@ function workbench_scheduler_load_schedules($names = FALSE) {
           return $return_schedules[$get_single];
         }
       }
-      elseif (count($return_schedules)>0) {
+      elseif (count($return_schedules) > 0) {
         return $return_schedules;
       }
     }
@@ -1383,13 +1387,6 @@ function workbench_scheduler_moderate_unpublish($node) {
 
 /**
  * Content Type Edit Form.
- *
- * @param $form
- *    The form object.
- * @param $form_state
- *    The form_state object.
- * @param $form_id
-*    The form id.
  */
 function workbench_scheduler_form_node_type_form_alter(&$form, &$form_state, $form_id) {
 

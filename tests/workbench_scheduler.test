@@ -42,11 +42,11 @@ class WorkbenchSchedulerTestCase extends DrupalWebTestCase {
  */
 class WorkbenchSchedulerScheduleTestCase extends WorkbenchSchedulerTestCase {
 
-  public static function getInfo(){
+  public static function getInfo() {
     return array(
-        'name' => 'Create Workbench Schedule',
-        'description' => 'Create a new workbench schedule',
-        'group' => 'Workbench Scheduler',
+      'name' => 'Create Workbench Schedule',
+      'description' => 'Create a new workbench schedule',
+      'group' => 'Workbench Scheduler',
     );
   }
 
@@ -57,23 +57,23 @@ class WorkbenchSchedulerScheduleTestCase extends WorkbenchSchedulerTestCase {
 
   function testScheduleCreate() {
 
-      $states = workbench_scheduler_state_labels();
-      $indexes = array_rand($states, 2);
+    $states = workbench_scheduler_state_labels();
+    $indexes = array_rand($states, 2);
 
-      // Create schedule.
-      $edit = array();
-      $edit['label'] = $this->randomName(8);
-      $edit['name'] = strtolower($this->randomName(8));
-      $edit['start_state'] = $indexes[0];
-      $edit['end_state'] = $indexes[1];
-      //$edit['#schedule'] = new stdClass;
-      $edit["types[{$this->content_type}]"] = $this->content_type;
+    // Create schedule.
+    $edit = array();
+    $edit['label'] = $this->randomName(8);
+    $edit['name'] = strtolower($this->randomName(8));
+    $edit['start_state'] = $indexes[0];
+    $edit['end_state'] = $indexes[1];
+    // $edit['#schedule'] = new stdClass;
+    $edit["types[{$this->content_type}]"] = $this->content_type;
 
-      $this->drupalPost('admin/config/workbench/scheduler/schedules/add', $edit, t('Save'));
+    $this->drupalPost('admin/config/workbench/scheduler/schedules/add', $edit, t('Save'));
 
 
-      // Checking database integrity to see if it was created successfully.
-      $query = db_select('workbench_scheduler_schedules', 'wss')
+    // Checking database integrity to see if it was created successfully.
+    $query = db_select('workbench_scheduler_schedules', 'wss')
       ->fields('wss')
       ->condition('wss.name', $edit['name'], '=')
       ->condition('wss.label', $edit['label'], '=')
@@ -81,11 +81,11 @@ class WorkbenchSchedulerScheduleTestCase extends WorkbenchSchedulerTestCase {
       ->condition('wss.end_state', $edit['end_state'], '=')
       ->range(0, 1);
 
-      // Checking table relationships.
-      $query->join('workbench_scheduler_types', 'wst', "wss.name = wst.name AND wst.type ='{$this->content_type}'");
-      $query->execute();
+    // Checking table relationships.
+    $query->join('workbench_scheduler_types', 'wst', "wss.name = wst.name AND wst.type ='{$this->content_type}'");
+    $query->execute();
 
-      $this->assertTrue($query, 'Workbench Schedule saved');
+    $this->assertTrue($query, 'Workbench Schedule saved');
 
   }
 
@@ -98,9 +98,9 @@ class WorkbenchSchedulerNodeScheduleTestCase extends WorkbenchSchedulerTestCase 
 
   public static function getInfo() {
     return array(
-        'name' => 'Node Save Schedule',
-        'description' => 'Apply a schedule to a node',
-        'group' => 'Workbench Scheduler',
+      'name' => 'Node Save Schedule',
+      'description' => 'Apply a schedule to a node',
+      'group' => 'Workbench Scheduler',
     );
   }
 
@@ -151,7 +151,7 @@ class WorkbenchSchedulerNodeScheduleTestCase extends WorkbenchSchedulerTestCase 
   }
 
   /**
-   * Test Node Schedule
+   * Test Node Schedule.
    */
   public function testNodeSchedule() {
 
@@ -168,7 +168,7 @@ class WorkbenchSchedulerNodeScheduleTestCase extends WorkbenchSchedulerTestCase 
     $this->drupalPost('admin/config/workbench/scheduler/schedules/add', $edit, t('Save'));
 
 
-      // Get the sid.
+    // Get the sid.
     $query = db_select('workbench_scheduler_schedules', 'wss')
       ->fields('wss')
       ->condition('wss.name', $edit['name'], '=')
@@ -209,7 +209,7 @@ class WorkbenchSchedulerNodeScheduleTestCase extends WorkbenchSchedulerTestCase 
     $edit['workbench_scheduler_start_date[time]'] = date('H:i', $start_ts + 60);
     $edit['workbench_scheduler_end_date[date]'] = date('Y-m-d', $end_ts);
     $edit['workbench_scheduler_end_date[time]'] = date('H:i', $end_ts);
-    $this->drupalPost('node/'. $node->nid . '/edit', $edit, t('Save'));
+    $this->drupalPost('node/' . $node->nid . '/edit', $edit, t('Save'));
 
     $this->cronRun();
 

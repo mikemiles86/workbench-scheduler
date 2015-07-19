@@ -5,8 +5,4 @@ core = 7.x
 
 dependencies[] = workbench_moderation
 dependencies[] = date
-dependencies[] = date_popup
-
-files[] = includes/workbench_scheduler_handler_filter_state.inc
-files[] = includes/workbench_scheduler_handler_filter_name.inc
-files[] = tests/workbench_scheduler.test
+dependencies[] = date_popupx
