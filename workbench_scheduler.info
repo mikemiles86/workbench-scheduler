@@ -5,4 +5,4 @@ core = 7.x
 
 dependencies[] = workbench_moderation
 dependencies[] = date
-dependencies[] = date_popupx
+dependencies[] = date_popup
