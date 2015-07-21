@@ -357,10 +357,10 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
     foreach ($node_schedules as $vid => $node_schedule) {
       $start_date = t('not set');
       $end_date = t('not set');
-      if ($node_schedule->start_date) {
+      if (isset($node_schedule->start_date)) {
         $start_date = format_date($node_schedule->start_date, 'custom', 'Y-m-d H:i:s');
       }
-      if ($node_schedule->end_date) {
+      if (isset($node_schedule->end_date)) {
         $end_date = format_date($node_schedule->end_date, 'custom', 'Y-m-d H:i:s');
       }
 
