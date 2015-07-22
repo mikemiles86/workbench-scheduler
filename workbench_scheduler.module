@@ -153,6 +153,24 @@ function workbench_scheduler_permission() {
 }
 
 /**
+ * Implements hook_action_info().
+ */
+function workbench_scheduler_action_info() {
+  module_load_include('inc', 'workbench_scheduler', 'actions/workbench_scheduler.action');
+
+  return array(
+    'workbench_scheduler_schedules_action' => array(
+      'type' => 'node',
+      'label' => t('Set Workbench schedule to a node'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => TRUE,
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
  * Implements hook_node_load().
  */
 function workbench_scheduler_node_load($nodes, $types) {
@@ -1404,3 +1422,4 @@ function workbench_scheduler_form_node_type_form_alter(&$form, &$form_state, $fo
     '#default_value' => variable_get('workbench_scheduler_' . $form['#node_type']->type, array()),
   );
 }
+
