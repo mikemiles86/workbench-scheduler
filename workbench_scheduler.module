@@ -93,12 +93,11 @@ function workbench_scheduler_menu() {
 function workbench_scheduler_manage_schedules_access_check() {
   // First make sure user has access.
   if (user_access('set workbench schedule')) {
-    // Load the node.
-    $node = node_load(arg(1));
-    // Get list of node types that can have schedules.
-    $types = workbench_scheduler_get_types();
-    // Check if this node type is in the types array.
-    return in_array($node->type, $types);
+    // Attempt to load schedule types and node.
+    if (($types = workbench_scheduler_get_types()) && ($node = node_load(arg(1))) {
+      // Check if node is a schedule type.
+      return in_array($node->type, $types);
+    }
   }
 
   return FALSE;
