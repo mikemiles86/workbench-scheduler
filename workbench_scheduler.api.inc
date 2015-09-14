@@ -102,4 +102,3 @@ function hook_workbench_scheduler_post_process_end_dates(array $scheduled_nodes)
   // Set a watchdog log message.
   watchdog('workbench_scheduler', '@count nodes had their schedules ended.', array('@count' => count($scheduled_nodes)), WATCHDOG_NOTICE);
 }
-

@@ -10,7 +10,7 @@
  * Display a table of workbench schedule for administration.
  *
  * @return string
- *    themed output.
+ *   themed output.
  */
 function workbench_scheduler_admin_page() {
   // Build a table to show the different schedules.
@@ -95,7 +95,7 @@ function workbench_scheduler_admin_page() {
 }
 
 /**
- *  Display a form for adding/editing a schedule.
+ * Display a form for adding/editing a schedule.
  */
 function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name = FALSE) {
   $schedule = FALSE;
@@ -230,7 +230,7 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name = FA
 }
 
 /**
- *  Validation function for adding / editing a schedule.
+ * Validation function for adding / editing a schedule.
  */
 function workbench_scheduler_admin_edit_schedule_validate($form, &$form_state) {
   // Validate label.
@@ -244,7 +244,7 @@ function workbench_scheduler_admin_edit_schedule_validate($form, &$form_state) {
 }
 
 /**
- *  Submit function for adding/editing a schedule.
+ * Submit function for adding/editing a schedule.
  */
 function workbench_scheduler_admin_edit_schedule_submit($form, &$form_state) {
   // Check to see if the delete button was clicked.

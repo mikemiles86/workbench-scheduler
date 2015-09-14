@@ -18,7 +18,7 @@ function workbench_scheduler_drush_command() {
 }
 
 /**
- * Callback function
+ * Callback function.
  */
 function workbench_scheduler_drush_run() {
   // Call the run function, to process schedules.
