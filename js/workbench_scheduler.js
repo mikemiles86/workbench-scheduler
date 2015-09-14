@@ -16,9 +16,15 @@
             var start_time = $('input[name="workbench_scheduler_start_date[time]"]');
             var end_date = $('input[name="workbench_scheduler_end_date[date]"]');
             var end_time = $('input[name="workbench_scheduler_end_date[time]"]');
+            var schedules = Drupal.settings.workbench_scheduler.schedules;
+            var type = false;
 
-            // Hiding start date field.
-            if (Drupal.settings.workbench_scheduler.schedules[type_input.val()].start_state == '') {
+            if (type_input.val() in schedules) {
+                type = schedules[type_input.val()];
+            }
+
+            // Hiding start date field, if exists.
+            if (type && (type.start_state == '')) {
                 start_date.val('');
                 start_time.val('');
                 $(".form-item-workbench-scheduler-start-date").hide();
@@ -28,7 +34,7 @@
             }
 
             // Hiding end date field.
-            if (Drupal.settings.workbench_scheduler.schedules[type_input.val()].end_state == '') {
+            if (type && (type.end_state == '')) {
                 end_date.val('');
                 end_time.val('');
                 $(".form-item-workbench-scheduler-end-date").hide();
