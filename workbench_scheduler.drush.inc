@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Drush utility commands for workbench_scheduler
+ * Drush utility commands for workbench_scheduler.
  */
 
 /**

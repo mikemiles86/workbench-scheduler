@@ -64,7 +64,7 @@
                 vals.push(type.label);
 
                 // If schedule exists.
-                if(type_input.val() > 0){
+                if (type_input.val() > 0) {
 
                     // Start Date and Time.
                     var start_date = $('input[name="workbench_scheduler_start_date[date]"]');

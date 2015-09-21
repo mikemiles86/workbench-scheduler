@@ -11,7 +11,7 @@ function workbench_scheduler_schedules_action_form($options) {
   // Get all schedules from all content types.
   $cts_schedules = workbench_scheduler_load_type_schedules(array_keys($types));
   foreach ($cts_schedules as $ct => $schedules) {
-    foreach ($schedules  as $sid => $schedule) {
+    foreach ($schedules as $sid => $schedule) {
       $type_schedules[$sid] = $schedule;
     }
   }
@@ -95,13 +95,13 @@ function workbench_scheduler_schedules_action_form($options) {
       );
     }
 
-    $node_schedule = isset($form['#node']->workbench_schedule) ? $form['#node']->workbench_schedule:FALSE;
+    $node_schedule = isset($form['#node']->workbench_schedule) ? $form['#node']->workbench_schedule : FALSE;
     // Have a node schedule(editing a node)? Use for defaults.
     if ($node_schedule) {
       $form['workbench_scheduler']['workbench_scheduler_sid']['#default_value'] = $node_schedule->sid;
 
       if ($node_schedule->start_date) {
-        // Format date for field
+        // Format date for field.
         $start_date = format_date($node_schedule->start_date, 'custom', 'Y-m-d H:i:s');
         $form['workbench_scheduler']['dates']['workbench_scheduler_start_date']['#default_value'] = $start_date;
       }
@@ -117,7 +117,7 @@ function workbench_scheduler_schedules_action_form($options) {
   // Add custom validation and submission hooks.
   $form['#validate'][] = 'workbench_scheduler_node_form_validate';
   // Add to submit button action so that will have access to the new.
-  // Nid & vid values
+  // Nid & vid values.
   $form['actions']['submit']['#submit'][] = 'workbench_scheduler_node_form_submit';
 
   return $form;
@@ -148,15 +148,15 @@ function workbench_scheduler_schedules_action_submit($form, &$form_state) {
  * @param $entity
  * @param array $context
  */
-function  workbench_scheduler_schedules_action(&$entity, $context = array()) {
+function workbench_scheduler_schedules_action(&$entity, $context = array()) {
 
   $entity->workbench_schedule->sid = $context['workbench_scheduler_sid'];
 
-  if (isset($context['workbench_scheduler_start_date'])){
+  if (isset($context['workbench_scheduler_start_date'])) {
     $entity->workbench_schedule->start_date = strtotime($context['workbench_scheduler_start_date']);
   }
 
-  if (isset($context['workbench_scheduler_end_date'])){
+  if (isset($context['workbench_scheduler_end_date'])) {
     $entity->workbench_schedule->end_date = strtotime($context['workbench_scheduler_end_date']);
   }
 
@@ -164,4 +164,3 @@ function  workbench_scheduler_schedules_action(&$entity, $context = array()) {
   $live_revision = workbench_moderation_node_current_load($entity);
   $entity->vid = $live_revision->vid;
 }
-
