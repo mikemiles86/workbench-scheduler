@@ -31,17 +31,11 @@ function workbench_scheduler_schema() {
         'length' => '255',
         'not null' => TRUE,
       ),
-      'start_state' => array(
-        'description' => 'The state to set at the start date',
-        'type' => 'varchar',
-        'length' => '255',
+      'transition' => array(
+        'description' => 'The id of the transition',
+        'type' => 'int',
         'not null' => TRUE,
-      ),
-      'end_state' => array(
-        'description' => 'The state to set at the end date',
-        'type' => 'varchar',
-        'length' => '255',
-        'not null' => TRUE,
+        'unsigned' => TRUE,
       ),
     ),
     'primary key' => array('sid'),
@@ -92,18 +86,11 @@ function workbench_scheduler_schema() {
         'not null' => TRUE,
         'unsigned' => TRUE,
       ),
-      'start_date' => array(
-        'description' => 'the date when the start state should be applied',
+      'date' => array(
+        'description' => 'the date when the new state should be applied',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'end_date' => array(
-        'description' => 'the date when the end state should be applied',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'default' => 0,
-        'not null' => FALSE,
       ),
       'completed' => array(
         'description' => 'mark if the schedule has been completed for this node',
@@ -114,7 +101,7 @@ function workbench_scheduler_schema() {
       ),
     ),
     'unique keys' => array(
-      'vid' => array('vid'),
+      'vid' => array('vid', 'sid'),
     ),
     'foreign_keys' => array(
       'nid' => array('node' => 'nid'),

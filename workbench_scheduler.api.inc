@@ -62,7 +62,7 @@ function hook_workbench_scheduler_post_delete_node_schedule($nid, $vid, $sid) {
 /**
  * Perform action after starting schedules for nodes.
  *
- * This hook is invoked from workbench_scheduler_process_start_dates() after
+ * This hook is invoked from workbench_scheduler_process_dates() after
  * starting schedules for nodes.
  *
  * @param array $scheduled_nodes
@@ -71,34 +71,11 @@ function hook_workbench_scheduler_post_delete_node_schedule($nid, $vid, $sid) {
  *     - nid: The node nid
  *     - vid: The node revision id
  *     - sid: The schedule id
- *     - start_state: The state the node was set to.
  *
  * @ingroup workbench_scheduler_hooks
  * @ingroup hooks
  */
-function hook_workbench_scheduler_post_process_start_dates(array $scheduled_nodes) {
+function hook_workbench_scheduler_post_process_dates(array $scheduled_nodes) {
   // Set a watchdog log message.
-  watchdog('workbench_scheduler', '@count nodes had their schedules started.', array('@count' => count($scheduled_nodes)), WATCHDOG_NOTICE);
-}
-
-/**
- * Perform action after ending schedules for nodes.
- *
- * This hook is invoked from workbench_scheduler_process_end_dates() after
- * ending schedules for nodes.
- *
- * @param array $scheduled_nodes
- *   An array of node schedule data, each element in the array is an object
- *   containing the following properties:
- *     - nid: The node nid
- *     - vid: The node revision id
- *     - sid: The schedule id
- *     - end_state: The state the node was set to.
- *
- * @ingroup workbench_scheduler_hooks
- * @ingroup hooks
- */
-function hook_workbench_scheduler_post_process_end_dates(array $scheduled_nodes) {
-  // Set a watchdog log message.
-  watchdog('workbench_scheduler', '@count nodes had their schedules ended.', array('@count' => count($scheduled_nodes)), WATCHDOG_NOTICE);
+  watchdog('workbench_scheduler', '@count nodes had their schedules run.', array('@count' => count($scheduled_nodes)), WATCHDOG_NOTICE);
 }
