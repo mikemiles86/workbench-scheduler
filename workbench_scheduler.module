@@ -29,8 +29,8 @@ function workbench_scheduler_menu() {
   // Add schedule.
   $items['admin/config/workbench/scheduler/schedules/add'] = array(
     'title' => 'Add Schedule',
-    'description' => 'Create a new schedule.',
-    'type' => MENU_LOCAL_TASK,
+    'description' => 'Add Schedule',
+    'type' => MENU_LOCAL_ACTION,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('workbench_scheduler_admin_edit_schedule'),
     'access arguments' => array('administer workbench schedules'),

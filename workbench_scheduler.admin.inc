@@ -90,13 +90,6 @@ function workbench_scheduler_admin_page() {
       ),
     );
   }
-  // Add a row for a link to add a new schedule.
-  $rows[] = array(
-    array(
-      'data'    => l(t('Add Schedule'), 'admin/config/workbench/scheduler/schedules/add'),
-      'colspan' => 7,
-    ),
-  );
   // Returned the themed table.
   return theme('table', array('header' => $headers, 'rows' => $rows));
 
@@ -185,7 +178,7 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name = FA
 
   // Check to see if there are any schedules using this transition.
   $schedules = workbench_scheduler_load_schedules();
-  if (!empty($schedules)) {
+  if (!empty($schedule) && !empty($schedules)) {
     foreach ($schedules as $schedule_obj) {
       if ($schedule_obj->sid != $schedule->sid) {
         $form['transition'][$schedule_obj->transition]['#disabled'] = TRUE;

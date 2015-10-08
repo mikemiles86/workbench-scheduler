@@ -3,6 +3,8 @@ description = Provides ability to schedule state changes
 package = Workbench
 core = 7.x
 
+configure = admin/config/workbench/scheduler
+
 dependencies[] = workbench_moderation
 dependencies[] = date
 dependencies[] = date_popup
