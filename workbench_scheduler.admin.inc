@@ -73,9 +73,9 @@ function workbench_scheduler_admin_page() {
         $transition->name,
         $types,
         // Link to edit the schedule.
-        l(t('Edit'), 'admin/config/workbench/scheduler/schedules/' . $name . '/edit'),
+        l(t('edit'), 'admin/config/workbench/scheduler/schedules/' . $name . '/edit'),
         // Link to delete the scheduler.
-        l(t('Delete'), 'admin/config/workbench/scheduler/schedules/' . $name . '/delete'),
+        l(t('delete'), 'admin/config/workbench/scheduler/schedules/' . $name . '/delete'),
       );
       // Add to the rows array.
       $rows[] = $row;
@@ -178,9 +178,9 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name = FA
 
   // Check to see if there are any schedules using this transition.
   $schedules = workbench_scheduler_load_schedules();
-  if (!empty($schedule) && !empty($schedules)) {
+  if (!empty($schedules)) {
     foreach ($schedules as $schedule_obj) {
-      if ($schedule_obj->sid != $schedule->sid) {
+      if (empty($schedule) || $schedule_obj->sid != $schedule->sid) {
         $form['transition'][$schedule_obj->transition]['#disabled'] = TRUE;
       }
     }
@@ -229,7 +229,7 @@ function workbench_scheduler_admin_edit_schedule($form, &$form_state, $name = FA
     '#header'         => $header,
     '#options'        => $types,
     '#required'       => TRUE,
-    '#empty' => t('No Content Types are configured with workbench moderation'),
+    '#empty' => t('No content types are configured with workbench moderation.'),
   );
 
   $form['submit'] = array(
@@ -398,7 +398,7 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         'title' => array('data' => array('#title' => $vid)),
         'vid' => (array('data' => l($vid, 'node/' . $node->nid . '/revisions/' . $vid . '/view'), 'width' => 75)),
         'schedules' => theme('item_list', $schedule_list),
-        'vid_edit' => l(t('Edit'), 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
+        'vid_edit' => l(t('edit'), 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
       );
 
         // Active schedule?
@@ -441,15 +441,16 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         }
 
         // Output the table of schedules.
-        $form[$status . '_fieldset'][] = array(
+        $form[$status . '_fieldset']['schedules'] = array(
           '#type' => 'tableselect',
           '#title' => t('Schedules applied to this node'),
+          '#validated' => TRUE,
           '#options' => $records,
           '#multiple' => TRUE,
           '#header' => array(
             'vid' => t('Revision'),
             'schedules' => t('Schedules'),
-            'vid_edit' => t('Edit'),
+            'vid_edit' => t('Operations'),
           ),
         );
       }
@@ -473,12 +474,9 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
  */
 function workbench_scheduler_admin_manage_node_schedules_submit($form, &$form_state) {
   $nid = $form_state['values']['nid'];
-  $fieldsets = array('schedule_active', 'schedule_inactive');
-  foreach ($fieldsets as $key) {
-    foreach ($form_state['values'][$key] as $vid => $checked) {
-      if ($vid == $checked) {
-        workbench_scheduler_delete_node_schedule($nid, $vid);
-      }
+  foreach ($form_state['values']['schedules'] as $vid => $checked) {
+    if ($vid == $checked) {
+      workbench_scheduler_delete_node_schedule($nid, $vid);
     }
   }
 }
@@ -631,7 +629,6 @@ function workbench_scheduler_admin_edit_revision_schedule_submit($form, &$form_s
       if (workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data)) {
         // Success.
         drupal_set_message(t('Revision schedule updated'), 'status', FALSE);
-        drupal_goto('node/' . $nid . '/manage_schedules/');
       }
       else {
         drupal_set_message(t('Error saving workbench schedule for node'), 'error', FALSE);
@@ -639,7 +636,7 @@ function workbench_scheduler_admin_edit_revision_schedule_submit($form, &$form_s
     }
     else {
       workbench_scheduler_delete_node_schedule($nid, $vid, $sid);
-      drupal_goto('node/' . $nid . '/manage_schedules/');
     }
   }
+  drupal_goto('node/' . $nid . '/manage_schedules/');
 }

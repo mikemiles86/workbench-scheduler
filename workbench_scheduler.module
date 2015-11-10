@@ -1200,13 +1200,6 @@ function workbench_scheduler_process_dates($timestamp) {
           workbench_moderation_moderate($node, $transition->to_name);
         }
 
-        // TODO: Why save the node here?
-        // If not the 'published' state, set to 'unpublished.
-        /*if ($transition->to_name != workbench_moderation_state_published() && $node->status) {
-          $node->status = 0;
-          node_save($node);
-        }*/
-
         // Mark schedule as completed.
         workbench_scheduler_node_set_complete($node_schedule->nid, $node_schedule->vid, $node_schedule->sid);
         // Update count of run schedules.
