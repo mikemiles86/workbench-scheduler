@@ -9,6 +9,8 @@ dependencies[] = workbench_moderation
 dependencies[] = date
 dependencies[] = date_popup
 files[] = includes/workbench_scheduler_handler_filter_name.inc
+files[] = actions/workbench_scheduler.action.inc
+files[] = tests/workbench_scheduler.test
 
 ; Information added by Drupal.org packaging script on 2015-07-21
 version = "7.x-2.0-alpha1"
