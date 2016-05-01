@@ -401,7 +401,7 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         'vid_edit' => l(t('edit'), 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
       );
 
-        // Active schedule?
+      // Active schedule?
       if ($node->workbench_moderation['current']->vid == $vid && $is_moderated) {
         $schedules['schedule_active'][$vid] = $manage_schedules;
       }

@@ -17,8 +17,8 @@ function workbench_scheduler_views_data() {
   $data['workbench_scheduler_nodes']['table']['join'] = array(
     'node' => array(
       'left_table' => 'node_revision',
-      'left_field' => 'vid',
-      'field' => 'vid',
+      'left_field' => 'nid',
+      'field' => 'nid',
       'type' => 'LEFT OUTER',
     ),
     'node_revision' => array(
@@ -47,6 +47,16 @@ function workbench_scheduler_views_data() {
       'field' => 'vid',
       'handler' => 'views_handler_relationship',
       'label' => t('Node Revision'),
+    ),
+  );
+  
+  $data['workbench_scheduler_nodes']['is_active'] = array(
+    'title' => t('Active'),
+    'help' => t('Whether or not this schedule is active.'),
+    'filter' => array(
+      'handler' => 'workbench_scheduler_handler_filter_active',
+      'label' => t('Active'),
+      'type' => 'yes-no',
     ),
   );
 
