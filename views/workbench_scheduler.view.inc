@@ -10,7 +10,7 @@ $view = new view();
 $view->name = 'workbench_scheduler';
 $view->description = 'Lists content by schedule.';
 $view->tag = 'Workbench Scheduler';
-$view->base_table = 'node';
+$view->base_table = 'node_revision';
 $view->human_name = 'Workbench Scheduler: Content';
 $view->core = 7;
 $view->api_version = '3.0';
@@ -21,6 +21,7 @@ $handler = $view->new_display('default', 'Master', 'default');
 $handler->display->display_options['title'] = 'Scheduled Content';
 $handler->display->display_options['use_more_always'] = FALSE;
 $handler->display->display_options['access']['type'] = 'perm';
+$handler->display->display_options['access']['perm'] = 'use workbench_scheduler scheduled content tab';
 $handler->display->display_options['cache']['type'] = 'none';
 $handler->display->display_options['query']['type'] = 'views_query';
 $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -36,13 +37,11 @@ $handler->display->display_options['style_options']['grouping'] = array(
 );
 $handler->display->display_options['style_options']['columns'] = array(
   'nid' => 'nid',
+  'label' => 'label',
   'vid' => 'vid',
   'title' => 'title',
   'type' => 'type',
-  'label' => 'label',
-  'date' => 'date',
   'completed' => 'completed',
-  'is_active' => 'is_active',
   'nothing' => 'nothing',
 );
 $handler->display->display_options['style_options']['default'] = '-1';
@@ -50,6 +49,11 @@ $handler->display->display_options['style_options']['info'] = array(
   'nid' => array(
     'sortable' => 0,
     'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'label' => array(
     'align' => '',
     'separator' => '',
     'empty_column' => 0,
@@ -75,26 +79,7 @@ $handler->display->display_options['style_options']['info'] = array(
     'separator' => '',
     'empty_column' => 0,
   ),
-  'label' => array(
-    'align' => '',
-    'separator' => '',
-    'empty_column' => 0,
-  ),
-  'date' => array(
-    'sortable' => 0,
-    'default_sort_order' => 'asc',
-    'align' => '',
-    'separator' => '',
-    'empty_column' => 0,
-  ),
   'completed' => array(
-    'sortable' => 0,
-    'default_sort_order' => 'asc',
-    'align' => '',
-    'separator' => '',
-    'empty_column' => 0,
-  ),
-  'is_active' => array(
     'sortable' => 0,
     'default_sort_order' => 'asc',
     'align' => '',
@@ -114,33 +99,18 @@ $handler->display->display_options['empty']['area']['field'] = 'area';
 $handler->display->display_options['empty']['area']['empty'] = TRUE;
 $handler->display->display_options['empty']['area']['content'] = 'There is no scheduled content.';
 $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
-/* Relationship: Workbench Scheduler: Node Revision */
-$handler->display->display_options['relationships']['vid']['id'] = 'vid';
-$handler->display->display_options['relationships']['vid']['table'] = 'workbench_scheduler_nodes';
-$handler->display->display_options['relationships']['vid']['field'] = 'vid';
-$handler->display->display_options['relationships']['vid']['required'] = TRUE;
-/* Field: Content: Nid */
+/* Relationship: Workbench Scheduler: Node */
+$handler->display->display_options['relationships']['nid']['id'] = 'nid';
+$handler->display->display_options['relationships']['nid']['table'] = 'workbench_scheduler_nodes';
+$handler->display->display_options['relationships']['nid']['field'] = 'nid';
+$handler->display->display_options['relationships']['nid']['required'] = TRUE;
+/* Field: Content revision: Nid */
 $handler->display->display_options['fields']['nid']['id'] = 'nid';
-$handler->display->display_options['fields']['nid']['table'] = 'node';
+$handler->display->display_options['fields']['nid']['table'] = 'node_revision';
 $handler->display->display_options['fields']['nid']['field'] = 'nid';
 $handler->display->display_options['fields']['nid']['label'] = '';
 $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
 $handler->display->display_options['fields']['nid']['element_label_colon'] = FALSE;
-/* Field: Content revision: Vid */
-$handler->display->display_options['fields']['vid']['id'] = 'vid';
-$handler->display->display_options['fields']['vid']['table'] = 'node_revision';
-$handler->display->display_options['fields']['vid']['field'] = 'vid';
-$handler->display->display_options['fields']['vid']['relationship'] = 'vid';
-/* Field: Content: Title */
-$handler->display->display_options['fields']['title']['id'] = 'title';
-$handler->display->display_options['fields']['title']['table'] = 'node';
-$handler->display->display_options['fields']['title']['field'] = 'title';
-$handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
-$handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
-/* Field: Content: Type */
-$handler->display->display_options['fields']['type']['id'] = 'type';
-$handler->display->display_options['fields']['type']['table'] = 'node';
-$handler->display->display_options['fields']['type']['field'] = 'type';
 /* Field: Workbench Scheduler: Schedule Label */
 $handler->display->display_options['fields']['label']['id'] = 'label';
 $handler->display->display_options['fields']['label']['table'] = 'workbench_scheduler_schedules';
@@ -148,11 +118,27 @@ $handler->display->display_options['fields']['label']['field'] = 'label';
 $handler->display->display_options['fields']['label']['label'] = '';
 $handler->display->display_options['fields']['label']['exclude'] = TRUE;
 $handler->display->display_options['fields']['label']['element_label_colon'] = FALSE;
+/* Field: Content revision: Vid */
+$handler->display->display_options['fields']['vid']['id'] = 'vid';
+$handler->display->display_options['fields']['vid']['table'] = 'node_revision';
+$handler->display->display_options['fields']['vid']['field'] = 'vid';
+/* Field: Content revision: Title */
+$handler->display->display_options['fields']['title']['id'] = 'title';
+$handler->display->display_options['fields']['title']['table'] = 'node_revision';
+$handler->display->display_options['fields']['title']['field'] = 'title';
+$handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+$handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+$handler->display->display_options['fields']['title']['link_to_node_revision'] = TRUE;
+/* Field: Content: Type */
+$handler->display->display_options['fields']['type']['id'] = 'type';
+$handler->display->display_options['fields']['type']['table'] = 'node';
+$handler->display->display_options['fields']['type']['field'] = 'type';
+$handler->display->display_options['fields']['type']['relationship'] = 'vid';
 /* Field: Workbench Scheduler: Date */
 $handler->display->display_options['fields']['date']['id'] = 'date';
 $handler->display->display_options['fields']['date']['table'] = 'workbench_scheduler_nodes';
 $handler->display->display_options['fields']['date']['field'] = 'date';
-$handler->display->display_options['fields']['date']['date_format'] = 'long';
+$handler->display->display_options['fields']['date']['date_format'] = 'short';
 $handler->display->display_options['fields']['date']['second_date_format'] = 'long';
 /* Field: Workbench Scheduler: Completed */
 $handler->display->display_options['fields']['completed']['id'] = 'completed';
@@ -167,11 +153,11 @@ $handler->display->display_options['fields']['nothing']['label'] = 'Operations';
 $handler->display->display_options['fields']['nothing']['alter']['text'] = 'edit';
 $handler->display->display_options['fields']['nothing']['alter']['make_link'] = TRUE;
 $handler->display->display_options['fields']['nothing']['alter']['path'] = 'node/[nid]/manage_schedules/[vid]/edit?destination=admin/workbench/scheduled';
-$handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
 /* Sort criterion: Workbench Scheduler: Date */
 $handler->display->display_options['sorts']['date']['id'] = 'date';
 $handler->display->display_options['sorts']['date']['table'] = 'workbench_scheduler_nodes';
 $handler->display->display_options['sorts']['date']['field'] = 'date';
+$handler->display->display_options['sorts']['date']['relationship'] = 'nid';
 $handler->display->display_options['sorts']['date']['granularity'] = 'day';
 /* Filter criterion: Workbench Scheduler: Schedule Name */
 $handler->display->display_options['filters']['name']['id'] = 'name';
@@ -222,7 +208,7 @@ $handler->display->display_options['filters']['is_active']['expose']['remember_r
 );
 
 /* Display: Scheduled Content Page */
-$handler = $view->new_display('page', 'Scheduled Content Page', 'page');
+$handler = $view->new_display('page', 'Scheduled Content Page', 'scheduled_content_page');
 $handler->display->display_options['path'] = 'admin/workbench/scheduled';
 $handler->display->display_options['menu']['type'] = 'tab';
 $handler->display->display_options['menu']['title'] = 'Scheduled Content';
@@ -239,7 +225,7 @@ $translatables['workbench_scheduler'] = array(
   t('Asc'),
   t('Desc'),
   t('There is no scheduled content.'),
-  t('Node Revision'),
+  t('Node'),
   t('Vid'),
   t('Title'),
   t('Type'),

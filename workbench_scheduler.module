@@ -141,6 +141,10 @@ function workbench_scheduler_permission() {
     'title' => t('Set any workbench schedule'),
   );
 
+  $permissions['use workbench_scheduler scheduled content tab'] = array(
+    'title' => t('Use "Scheduled Content" workbench tab')
+  );
+  
   if ($schedules = workbench_scheduler_load_schedules()) {
     foreach ($schedules as $schedule) {
       $permissions['set workbench schedule for ' . $schedule->name] = array(
