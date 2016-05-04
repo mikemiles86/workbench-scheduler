@@ -727,7 +727,11 @@ function workbench_scheduler_load_node_schedule($nid, $vid) {
  */
 function workbench_scheduler_save_node_schedule($nid, $vid, $schedule_data) {
   // Need to have the sid and start date  or end date data.
-  if (isset($schedule_data['sid']) && $schedule_data['date']) {
+  // Do no save already completed schedules.
+  if (isset($schedule_data['sid'])
+      && $schedule_data['date']
+      && empty($schedule_data['completed'])) {
+
       // Run a merge query to insert or update the row.
       $merge = db_merge('workbench_scheduler_nodes')
         ->key(array(
