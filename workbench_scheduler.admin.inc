@@ -359,6 +359,9 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
     'schedule_inactive' => array(),
   );
 
+  // Getting language (for date formats).
+  global $language; 
+
   $node_schedules = array();
   foreach ($revisions as $vid => $revision) {
     // Load up all the schedules for all revisions of this node.
@@ -380,7 +383,7 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         // Date.
         $date = t('not set');
         if (isset($schedule->date)) {
-          $date = format_date($schedule->date, 'short');
+          $date = format_date($schedule->date, 'short', $language->language);
         }
 
         // TODO: Need to change the way this looks when rendered.
@@ -494,6 +497,8 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
 
   $transitions = workbench_moderation_transitions();
 
+  // Getting language (for date formats).
+  global $language; 
 
   // Add each type schedule to the options array.
   foreach ($type_schedules as $schedule) {
@@ -557,7 +562,7 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
     // Start date.
     $form['workbench_scheduler']['dates'][$sid]['workbench_scheduler_date'][$sid] = array(
       '#type' => 'date_popup',
-      '#date_format' => 'Y-m-d H:i',
+      '#date_format' => date_format_type_format('short', $language->language),
       '#title' =>  t('Set content to ') . $schedule['to_name'] . t(' after . . .'),
       '#description' => t('Note: This schedule will not run until content state is ') .'<strong>'. $schedule['from_name'] . '</strong>' ,
     );
@@ -573,8 +578,7 @@ function workbench_scheduler_admin_edit_revision_schedule($form, &$form_state, $
 
           if ($node_schedule->sid == $sid && $node_schedule->date) {
             // Format date for field.
-            $date = format_date($node_schedule->date, 'custom', 'Y-m-d H:i:s');
-
+            $date = format_date($node_schedule->date, 'custom', DATE_FORMAT_DATETIME);
             $form['workbench_scheduler']['dates'][$sid]['workbench_scheduler_date'][$sid]['#default_value'] = $date;
             // Disable schedule after it has been run.
             if ($node_schedule->completed) {

@@ -332,7 +332,7 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
       // Start date.
       $form['workbench_scheduler']['dates'][$sid]['workbench_scheduler_date'][$sid] = array(
         '#type' => 'date_popup',
-        '#date_format' => 'Y-m-d H:i',
+        '#date_format' => date_format_type_format('short'),
         '#title' =>  t('Set content to ') . $schedule['to_name'] . t(' after . . .'),
         '#description' => t('Note: This schedule will not run until content state is ') .'<strong>'. $schedule['from_name'] . '</strong>' ,
       );
@@ -350,7 +350,7 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
 
               if ($node_schedule->sid == $sid && $node_schedule->date) {
                 // Format date for field.
-                $date = format_date($node_schedule->date, 'custom', 'Y-m-d H:i:s');
+                $date = format_date($node_schedule->date, 'custom', DATE_FORMAT_DATETIME);
                 $form['workbench_scheduler']['dates'][$sid]['workbench_scheduler_date'][$sid]['#default_value'] = $date;
               }
             }
