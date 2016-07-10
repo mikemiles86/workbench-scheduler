@@ -133,7 +133,7 @@ $handler->display->display_options['fields']['title']['link_to_node_revision'] =
 $handler->display->display_options['fields']['type']['id'] = 'type';
 $handler->display->display_options['fields']['type']['table'] = 'node';
 $handler->display->display_options['fields']['type']['field'] = 'type';
-$handler->display->display_options['fields']['type']['relationship'] = 'vid';
+$handler->display->display_options['fields']['type']['relationship'] = 'nid';
 /* Field: Workbench Scheduler: Date */
 $handler->display->display_options['fields']['date']['id'] = 'date';
 $handler->display->display_options['fields']['date']['table'] = 'workbench_scheduler_nodes';
@@ -157,7 +157,6 @@ $handler->display->display_options['fields']['nothing']['alter']['path'] = 'node
 $handler->display->display_options['sorts']['date']['id'] = 'date';
 $handler->display->display_options['sorts']['date']['table'] = 'workbench_scheduler_nodes';
 $handler->display->display_options['sorts']['date']['field'] = 'date';
-$handler->display->display_options['sorts']['date']['relationship'] = 'nid';
 $handler->display->display_options['sorts']['date']['granularity'] = 'day';
 /* Filter criterion: Workbench Scheduler: Schedule Name */
 $handler->display->display_options['filters']['name']['id'] = 'name';

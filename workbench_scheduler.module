@@ -12,7 +12,7 @@ function workbench_scheduler_menu() {
 
   // Schedules.
   $items['admin/config/workbench/scheduler'] = array(
-    'title' => 'Workbench Schedules',
+    'title' => 'Workbench Scheduler',
     'description' => 'Manage content workbench schedules.',
     'page callback' => 'workbench_scheduler_admin_page',
     'access arguments' => array('administer workbench schedules'),
@@ -24,6 +24,17 @@ function workbench_scheduler_menu() {
     'title' => 'Schedules',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight'  => -1,
+  );
+
+  // Settings.
+  $items['admin/config/workbench/scheduler/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Manage workbench scheduler settings',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('workbench_scheduler_admin_settings_page'),
+    'access arguments' => array('administer workbench schedules'),
+    'file' => 'workbench_scheduler.admin.inc',
   );
 
   // Add schedule.
@@ -144,7 +155,7 @@ function workbench_scheduler_permission() {
   $permissions['use workbench_scheduler scheduled content tab'] = array(
     'title' => t('Use "Scheduled Content" workbench tab')
   );
-  
+
   if ($schedules = workbench_scheduler_load_schedules()) {
     foreach ($schedules as $schedule) {
       $permissions['set workbench schedule for ' . $schedule->name] = array(
@@ -1213,29 +1224,39 @@ function workbench_scheduler_process_dates($timestamp) {
       $rev_list = node_revision_list($node_schedule);
       $latest_vid = max(array_keys($rev_list));
 
-      if ($node_schedule->vid == $latest_vid) {
-        $do_process = TRUE;
-      }
-
-
       // Need to load the node.
       $node = node_load($node_schedule->nid, $node_schedule->vid);
-      if (!empty($node) && $transition->from_name == $node->workbench_moderation['current']->state && $do_process) {
-        // Only moderate if state is not 'unpublish'.
-        // If transition is not published  follow a different workflow.
-        if ($transition->to_name != workbench_moderation_state_published() && $node->status) {
-          workbench_scheduler_moderate_unpublish($node, $transition->to_name);
-        }
-        else {
-          // Moderate the node using workbench_moderation.
-          workbench_moderation_moderate($node, $transition->to_name);
+      if (!empty($node)) {
+        // If node schedule vid is the same as the latest revision.
+        if ($node_schedule->vid == $latest_vid && $transition->from_name == $node->workbench_moderation['current']->state) {
+          $do_process = TRUE;
         }
 
-        // Mark schedule as completed.
-        workbench_scheduler_node_set_complete($node_schedule->nid, $node_schedule->vid, $node_schedule->sid);
-        // Update count of run schedules.
-        $count++;
-        module_invoke_all('workbench_scheduler_post_process_dates', $node_schedule);
+        // If running published revisions is enabled.
+        if (variable_get('workbench_scheduler_settings_published_revisions', FALSE)
+          // If node schedule vid is the same as the published revision.
+          && !empty($node->workbench_moderation['published'])
+          && $node_schedule->vid == $node->workbench_moderation['published']->vid) {
+          $do_process = TRUE;
+        }
+
+        if ($do_process) {
+          // Only moderate if state is not 'unpublish'.
+          // If transition is not published  follow a different workflow.
+          if ($transition->to_name != workbench_moderation_state_published() && $node->status) {
+            workbench_scheduler_moderate_unpublish($node, $transition->to_name);
+          }
+          else {
+            // Moderate the node using workbench_moderation.
+            workbench_moderation_moderate($node, $transition->to_name);
+          }
+
+          // Mark schedule as completed.
+          workbench_scheduler_node_set_complete($node_schedule->nid, $node_schedule->vid, $node_schedule->sid);
+          // Update count of run schedules.
+          $count++;
+          module_invoke_all('workbench_scheduler_post_process_dates', $node_schedule);
+        }
       }
     }
   }

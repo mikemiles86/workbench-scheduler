@@ -349,6 +349,34 @@ function workbench_scheduler_admin_delete_schedule_submit($form, &$form_state) {
 }
 
 /**
+ * Workbench scheduler admin settings page callback.
+ */
+function workbench_scheduler_admin_settings_page($form, &$form_state) {
+
+  // Cron settings fieldset.
+  $form['cron'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Cron settings'),
+  );
+
+  // Run schedule on published revisions.
+  $form['cron']['workbench_scheduler_settings_published_revisions'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Run schedules on published revisions.'),
+    '#description' => t('By default, schedules are only executed on the latest node revision. Enable this to execute schedules on any published node revision.'),
+    '#default_value' => variable_get('workbench_scheduler_settings_published_revisions', FALSE)
+  );
+
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Settings'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
  * Tableselect form for current schedules applied to a node.
  */
 function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $node) {
@@ -404,8 +432,24 @@ function workbench_scheduler_admin_manage_node_schedules($form, &$form_state, $n
         'vid_edit' => l(t('edit'), 'node/' . $node->nid . '/manage_schedules/' . $vid . '/edit'),
       );
 
+      $active = FALSE;
+
+      if ($is_moderated) {
+        // If running published revisions is enabled.
+        if (variable_get('workbench_scheduler_settings_published_revisions')
+          // If node schedule vid is the same as the published revision.
+          && !empty($node->workbench_moderation['published'])
+          && $node->workbench_moderation['published']->vid == $vid) {
+          $active = TRUE;
+        }
+
+        if ($node->workbench_moderation['current']->vid == $vid && $is_moderated) {
+          $active = TRUE;
+        }
+      }
+
       // Active schedule?
-      if ($node->workbench_moderation['current']->vid == $vid && $is_moderated) {
+      if ($active) {
         $schedules['schedule_active'][$vid] = $manage_schedules;
       }
       else {

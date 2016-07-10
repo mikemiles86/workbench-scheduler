@@ -15,16 +15,10 @@ function workbench_scheduler_views_data() {
   $data['workbench_scheduler_nodes']['table']['group'] = t('Workbench Scheduler');
 
   $data['workbench_scheduler_nodes']['table']['join'] = array(
-    'node' => array(
-      'left_table' => 'node_revision',
-      'left_field' => 'nid',
-      'field' => 'nid',
-      'type' => 'LEFT OUTER',
-    ),
     'node_revision' => array(
       'left_field' => 'vid',
       'field' => 'vid',
-      'type' => 'LEFT OUTER',
+      'type' => 'INNER',
     ),
   );
 
