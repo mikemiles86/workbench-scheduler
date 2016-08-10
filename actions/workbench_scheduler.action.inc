@@ -7,7 +7,7 @@
 function workbench_scheduler_schedules_action_form($options) {
 
   // Does the user have permission to set schedules?
-  $user_permission = user_access('set workbench schedule');
+  $user_permission = workbench_scheduler_set_schedules_access_check();
   // And are there any schedules for this node type?
   $form = array();
   $types = node_type_get_types();
@@ -26,7 +26,7 @@ function workbench_scheduler_schedules_action_form($options) {
     $form['workbench_scheduler'] = array(
       '#type' => 'fieldset',
       '#title' => t('Workbench Schedule'),
-      '#access' => user_access('set workbench schedule'),
+      '#access' => workbench_scheduler_set_schedules_access_check() || user_access('view any workbench schedule'),
       '#attached' => array(
         'js' => array(drupal_get_path('module', 'workbench_scheduler') . '/js/workbench_scheduler.js'),
       ),

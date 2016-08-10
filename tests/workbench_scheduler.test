@@ -30,7 +30,6 @@ class WorkbenchSchedulerTestCase extends DrupalWebTestCase {
       "create {$this->content_type} content",
       'administer workbench schedules',
       'administer content types',
-      'set workbench schedule',
       'set any workbench schedule',
     ));
 
