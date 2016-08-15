@@ -11,8 +11,8 @@
     Drupal.behaviors.workbenchSchedulerSettingsSelectAllToggle = {
        attach: function (context) {
            // Trigger change event on all checkboxes. 
-           $('table.workbench-scheduler-sid th.select-all > input.form-checkbox').change(function() {
-               $('input.workbench-scheduler-sid').change();
+           $('table.workbench-schedule-sid th.select-all > input.form-checkbox').change(function() {
+               $('input.workbench-schedule-sid').change();
            });
        } 
     }
