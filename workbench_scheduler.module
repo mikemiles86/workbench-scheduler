@@ -1384,3 +1384,18 @@ function workbench_scheduler_moderate_unpublish($node, $state){
   node_save($live_revision);
 }
 
+/**
+ * Implements hook_workbench_moderation_transition_delete().
+ */
+function workbench_scheduler_workbench_moderation_transition_delete($transition) {
+  // Delete any schedules that use this transition. 
+  // Also deletes schedules when states (Draft, Published etc.) are deleted. 
+  $schedules = workbench_scheduler_load_schedules(); 
+  if (!empty($schedules)) {
+    foreach ($schedules as $schedule) {
+      if ($schedule->transition == $transition->id) {
+        workbench_scheduler_delete_schedules($schedule->name);
+      }
+    }
+  }
+}
