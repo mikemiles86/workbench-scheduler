@@ -437,14 +437,13 @@ function workbench_scheduler_form_node_form_alter(&$form, &$form_state, $form_id
       }
 
       // Have a node schedule(editing a node)? Use for defaults.
+      // Do not use data from completed schedules.
       if (!empty($node_schedules)) {
         foreach ($node_schedules as $node_schedule) {
-          if ($node_schedule) {
-            if ($node_schedule->sid == $sid && $node_schedule->date) {
-              // Format date for field.
-              $date = format_date($node_schedule->date, 'custom', DATE_FORMAT_DATETIME);
-              $form['workbench_scheduler']['dates'][$sid]['workbench_scheduler_date'][$sid]['#default_value'] = $date;
-            }
+          if (!empty($node_schedule) && $node_schedule->sid == $sid && $node_schedule->date && !$node_schedule->completed) {
+            // Format date for field.
+            $date = format_date($node_schedule->date, 'custom', DATE_FORMAT_DATETIME);
+            $form['workbench_scheduler']['dates'][$sid]['workbench_scheduler_date'][$sid]['#default_value'] = $date;
           }
         }
       }
