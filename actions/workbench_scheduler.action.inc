@@ -87,7 +87,7 @@ function workbench_scheduler_schedules_action_form($options) {
         'to_name' => t('Set content state to . . .'),
       ),
       '#attributes' => array(
-        'class' => array('workbench-scheduler-sid'),
+        'class' => array('workbench-schedule-sid'),
       ),
     );
 
