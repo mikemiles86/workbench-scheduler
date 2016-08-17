@@ -126,7 +126,7 @@ class WorkbenchSchedulerNodeScheduleTestCase extends WorkbenchSchedulerTestCase 
     // Adding schedules. Supports multple.
     foreach ($schedule as $sid => $time) {
       $edit['workbench_scheduler_sid[' . $sid . ']'] = TRUE;
-      $edit['workbench_scheduler_date[' . $sid . '][date]'] = date('Y-m-d', $time);
+      $edit['workbench_scheduler_date[' . $sid . '][date]'] = date('m/d/Y', $time);
       $edit['workbench_scheduler_date[' . $sid . '][time]'] = date('H:i', $time);
     }
     $this->drupalPost('node/add/' . $this->content_type, $edit, t('Save'));
@@ -203,7 +203,7 @@ class WorkbenchSchedulerNodeScheduleTestCase extends WorkbenchSchedulerTestCase 
     // Add a new schedule that happens after.
     $edit = array();
     $edit['workbench_scheduler_sid['.$schedule->sid.']'] = TRUE;
-    $edit['workbench_scheduler_date['.$schedule->sid.'][date]'] = date('Y-m-d', $ts + 60);
+    $edit['workbench_scheduler_date['.$schedule->sid.'][date]'] = date('m/d/Y', $ts + 60);
     $edit['workbench_scheduler_date['.$schedule->sid.'][time]'] = date('H:i', $ts + 60);
     $this->drupalPost('node/add/' . $this->content_type, $edit, t('Save'));
 
