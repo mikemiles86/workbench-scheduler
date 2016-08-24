@@ -156,10 +156,9 @@ function  workbench_scheduler_schedules_action(&$entity, $context = array()) {
   // Only save schedules for content that supports them.
   $types_moderated = workbench_moderation_moderate_node_types();
   $is_moderated = (in_array($entity->type, $types_moderated)) ? TRUE : FALSE;
+  $schedules = workbench_scheduler_load_type_schedules($entity->type);
 
-  if ($is_moderated) {
-    $schedules = workbench_scheduler_load_schedules();
-
+  if ($is_moderated && !empty($schedules)) {
     // Reset the workbench schedule.
     if ($context['workbench_scheduler_reset']) {
       $entity->workbench_schedule = array();
