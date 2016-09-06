@@ -34,7 +34,7 @@ function workbench_scheduler_schema() {
       'transition' => array(
         'description' => 'The id of the transition',
         'type' => 'int',
-        'not null' => TRUE,
+        'not null' => FALSE,
         'unsigned' => TRUE,
       ),
     ),
@@ -90,7 +90,8 @@ function workbench_scheduler_schema() {
         'description' => 'the date when the new state should be applied',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
       ),
       'completed' => array(
         'description' => 'mark if the schedule has been completed for this node',
@@ -111,4 +112,278 @@ function workbench_scheduler_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Update from 7.x-1.9 version to 7.x-2.0 version.
+ */
+function workbench_scheduler_update_7200(&$sandbox) {
+  $message = t('Workbench Scheduler updates completed.');
+  // First pass, no progress set.
+  if (!isset($sandbox['phase'])) {
+    // Check to see if old fields exist. Olny run update is upgrading from 1.x.
+    if (db_field_exists('workbench_scheduler_schedules', 'start_state')) {
+      // Set phase.
+      $sandbox['phase'] = 1;
+    }
+    else {
+      //Can skip updating.
+      $sandbox['phase'] = 5;
+    }
+    $sandbox['max_phases'] = 5;
+  }
+
+  // Change actions based on phase.
+  switch ($sandbox['phase']) {
+    // Phase one(1): Add new DB fields.
+    case 1:
+      $schema = workbench_scheduler_schema();
+      // Add new Schedules DB fields.
+      if (!db_field_exists('workbench_scheduler_schedules', 'transition')) {
+        db_add_field('workbench_scheduler_schedules', 'transition', $schema['workbench_scheduler_schedules']['fields']['transition']);
+      }
+      // Add new Nodes DB fields.
+      if (!db_field_exists('workbench_scheduler_nodes', 'date')) {
+        db_add_field('workbench_scheduler_nodes', 'date', $schema['workbench_scheduler_nodes']['fields']['date']);
+      }
+      // Move onto Phase two(2).
+      $sandbox['phase'] = 2;
+      // Set current schedule.
+      $sandbox['current_sid'] = 0;
+      // Set schedule progress.
+      $sandbox['schedule_progress'] = 0;
+      // Get schedule max
+      $sandbox['schedule_max'] = db_query('SELECT COUNT(*) FROM {workbench_scheduler_schedules} WHERE transition IS NULL')->fetchField();
+      break;
+    // Phase two(2): Update schedules.
+    case 2:
+      // Query for next schedule.
+      $schedule = db_select('workbench_scheduler_schedules', 's')
+        ->fields('s', array('sid', 'label', 'start_state', 'end_state'))
+        ->condition('sid', $sandbox['current_sid'], '>')
+        ->condition('transition', NULL)
+        ->range(0, 1)
+        ->orderBy('sid', 'ASC')
+        ->execute()
+        ->fetchObject();
+      // Was a schedule found?
+      if ($schedule) {
+        // Attempt to find a Workbench Moderation transition with these states.
+        $transition_id = db_select('workbench_moderation_transitions  ', 't')
+          ->fields('t', array('id'))
+          ->condition('from_name', $schedule->start_state)
+          ->condition('to_name', $schedule->end_state)
+          ->range(0, 1)
+          ->execute()
+          ->fetchField();
+        // If not able to find a transition id, then create a new transition.
+        if (!$transition_id) {
+          $transition_id = db_insert('workbench_moderation_transitions')
+            ->fields(array(
+              'name' => $schedule->start_state . ' to ' . $schedule->end_state,
+              'from_name' => $schedule->start_state,
+              'to_name' => $schedule->end_state,
+            ))
+            ->execute();
+        }
+        // Have a transition_id?
+        if ($transition_id) {
+          // Assign that transition to this schedule.
+          db_update('workbench_scheduler_schedules')
+            ->fields(array(
+              'transition' => $transition_id
+            ))
+            ->condition('sid', $schedule->sid)
+            ->execute();
+          // Move on to next schedule
+          $sandbox['current_sid'] = $schedule->sid;
+          // Update percentage complete.
+          $sandbox['schedule_progress']++;
+        }
+        // Not able to find or create one, return an error.
+        else {
+          throw new DrupalUpdateException('Unable to find/create Workbench Moderation transition for schedule "%schedule"', array('%schedule' => $schedule->label));
+        }
+      }
+      else {
+        // set progress to max.
+        $sandbox['schedule_progress'] = $sandbox['schedule_max'];
+        // Go to phase three(3).
+        $sandbox['phase'] = 3;
+        // Set current node.
+        $sandbox['current_nid'] = 0;
+        // Set node progress.
+        $sandbox['node_progress'] = 0;
+        // Get node max.
+        $sandbox['node_max'] = db_query('SELECT COUNT(*) FROM {workbench_scheduler_nodes} WHERE date = 0')->fetchField();
+      }
+      break;
+    // Phase three(3): Update nodes.
+    case 3:
+      // Query for next nid.
+      $nid = db_select('workbench_scheduler_nodes', 'n')
+        ->fields('n', array('nid'))
+        ->condition('nid', $sandbox['current_nid'], '>')
+        ->condition('date', 0)
+        ->orderBy('nid', 'ASC')
+        ->execute()
+        ->fetchField();
+
+      // Have a nid?
+      if ($nid) {
+        // Get next three(3) revisions to update.
+        $revisions = db_select('workbench_scheduler_nodes', 'n')
+          ->fields('n', array('sid', 'vid', 'completed', 'start_date', 'end_date'))
+          ->condition('nid', $nid)
+          ->condition('date', 0)
+          ->range(0, 3)
+          ->orderBy('nid', 'ASC')
+          ->orderBy('vid', 'ASC')
+          ->execute();
+        // Have revisions?
+        if ($revisions->rowCount() > 0) {
+          // Loop through each revision.
+          foreach ($revisions as $revision) {
+            // Has the revision already been completed?
+            if ($revision->completed) {
+              // Use end date if set, else use the start date.
+              $date = $revision->end_date ?: $revision->start_date;
+              // Set the value of the date field.
+              db_update('workbench_scheduler_nodes')
+                ->fields(array(
+                  'date' => $date
+                ))
+                ->condition('nid', $nid)
+                ->condition('vid', $revision->vid)
+                ->execute();
+            }
+            // Has not been completed, need to create new schedules.
+            else {
+              // Get the start state from schedule
+              $start_state = db_select('workbench_scheduler_schedules', 's')
+                ->fields('s', array('start_state'))
+                ->condition('sid', $revision->sid)
+                ->execute()
+                ->fetchField();
+              // Get the state before the start state from history
+              $from_state = db_select('workbench_moderation_node_history', 'h')
+                ->fields('h', array('from_state'))
+                ->condition('nid', $nid)
+                ->condition('vid', $revision->vid)
+                ->condition('state', $start_state)
+                ->execute()
+                ->fetchField();
+              // if start state != previous state
+              if ($from_state && ($start_state != $from_state)) {
+                // Find transition from state to start state.
+                $tid = db_select('workbench_moderation_transitions', 't')
+                  ->fields('t', array('id'))
+                  ->condition('from_name', $from_state)
+                  ->condition('to_name', $start_state)
+                  ->execute()
+                  ->fetchField();
+                // If not found, create transition.
+                if (!$tid) {
+                  $tid = db_insert('workbench_moderation_transitions')
+                    ->fields(array(
+                      'name' => $from_state . ' to ' . $start_state,
+                      'from_name' => $from_state,
+                      'to_name' => $start_state,
+                    ))
+                    ->execute();
+                }
+                // Find schedule with transition.
+                $sid = db_select('workbench_scheduler_schedules', 's')
+                  ->fields('s', array('sid'))
+                  ->condition('transition', $tid)
+                  ->execute()
+                  ->fetchField();
+                // If not found, create schedule.
+                if (!$sid) {
+                  $sid = db_insert('workbench_scheduler_schedules', 's')
+                    ->fields(array(
+                      'name' => $from_state . '_' . $start_state,
+                      'label' => $from_state . ' to ' . $start_state,
+                      'transition' => $tid,
+                    ))
+                    ->execute();
+                  // Create association between schedule and node type.
+                  $type = db_select('node', 'n')
+                    ->fields('n', array('type'))
+                    ->condition('nid', $nid)
+                    ->execute()
+                    ->fetchField();
+
+                  db_insert('workbench_scheduler_types')
+                    ->fields(array(
+                      'name' => $from_state . '_' . $start_state,
+                      'type' => $type,
+                    ))
+                    ->execute();
+                }
+                // If have schedule.
+                if ($sid) {
+                  // Update node with new schedule.
+                  db_update('workbench_scheduler_nodes')
+                    ->fields(array(
+                      'sid' => $sid,
+                      'date' => $revision->start_date,
+                    ))
+                    ->condition('nid', $nid)
+                    ->condition('vid', $revision->vid)
+                    ->execute();
+                }
+              }
+              else {
+                // Use end date if set, else use the start date.
+                $date = $revision->end_date ?: $revision->start_date;
+                // Set the value of the date field.
+                db_update('workbench_scheduler_nodes')
+                  ->fields(array(
+                    'date' => $date
+                  ))
+                  ->condition('nid', $nid)
+                  ->condition('vid', $revision->vid)
+                  ->execute();
+              }
+            }
+            // Update progress.
+            $sandbox['node_progress']++;
+          }
+        }
+        // All revisions updated for this node, move onto next.
+        else {
+          // Set current nid.
+          $sandbox['current_nid'] = $nid;
+        }
+      }
+      // No nodes to retrieve, move onto phase four(4).
+      else {
+        // Set progress to max.
+        $sandbox['node_progress'] = $sandbox['node_max'];
+        // Set message.
+        $message = t('All Workbench Scheduler nodes updated.');
+        // Go to phase four(4)
+        $sandbox['phase'] = 4;
+      }
+      break;
+    // Phase four(4): Delete old DB fields.
+    case 4:
+      // Drop Schedule fields.
+      if (db_field_exists('workbench_scheduler_schedules', 'start_state')) {
+        db_drop_field('workbench_scheduler_schedules', 'start_state');
+        db_drop_field('workbench_scheduler_schedules', 'end_state');
+      }
+      // Drop node fields.
+      if (db_field_exists('workbench_scheduler_nodes', 'start_date')) {
+        db_drop_field('workbench_scheduler_nodes', 'start_date');
+        db_drop_field('workbench_scheduler_nodes', 'end_date');
+      }
+      $sandbox['phase'] = 5;
+      break;
+  }
+
+  $sandbox['#finished'] = $sandbox['phase'] / $sandbox['max_phases'];
+
+  return $message;
 }
